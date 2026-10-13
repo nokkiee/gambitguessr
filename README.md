@@ -1,0 +1,115 @@
+# GambitGuessr
+
+**Learn chess openings by guessing them.** GeoGuessr drops you somewhere in the world and you
+guess where. GambitGuessr plays out the first moves of a game and you guess the opening, or
+it names an opening and you play its moves on the board.
+
+It's a free desktop app for Windows and Linux, styled after chess.com's game screen. It works
+offline and has no account, ads or tracking. It covers all 3,177 named openings from the
+Lichess opening database, from the Italian Game to the Sicilian Najdorf's English Attack.
+
+![Name It: guess the opening from the board](docs/screenshots/name-it.png)
+
+## Download
+
+Get the latest version from the [**Releases page**](../../releases/latest).
+
+| System | File | How |
+|---|---|---|
+| Windows 10 / 11 | `GambitGuessr-Setup-<version>.exe` | Run it. It installs in a few seconds and adds a Start-menu and desktop shortcut. |
+| Windows, no install | `GambitGuessr-<version>-Portable.exe` | Just run it. |
+| Linux (any distro) | `GambitGuessr-<version>.AppImage` | Make it executable (`chmod +x`), then run it. |
+| Debian / Ubuntu | `gambitguessr_<version>_amd64.deb` | `sudo apt install ./gambitguessr_<version>_amd64.deb` |
+
+The Windows files aren't code-signed, so Windows may show *"Windows protected your PC"*.
+Click **More info → Run anyway**.
+
+## How it works
+
+### Name It: guess the opening
+
+The moves play out on the board and you type the opening's name.
+- Spelling mistakes and missing words like "Defense" are fine.
+- Nicknames work too: *Spanish* for the Ruy Lopez, *Petroff*, *QGD*, *KID*, *Caro Kann*, *Gruenfeld*.
+- If you get the opening right but not the variation, you're told so and can try again.
+- **Hint** reveals the name little by little.
+- A streak counter keeps you honest.
+
+### Play It: play the moves
+
+You're given the name of an opening and play its moves by dragging pieces or clicking
+them. The app answers with the book moves for the other side.
+
+![Play It: a book move that leads to a different opening](docs/screenshots/play-it.png)
+
+- A correct move gets a green ✓, and a wrong one gets a red ✕ and is taken back.
+- A real opening move that belongs to another line gets a book icon, with the name of the opening it leads to.
+- A move from later in the line gets an amber icon.
+- **Hint** shows which piece to move, then the arrow.
+- **You play: Auto** gives you the side that owns the opening: Black for the Sicilian, White for the Ruy Lopez.
+
+### Library: see what's left to learn
+
+![Library: Beginner, Intermediate and Expert categories with progress](docs/screenshots/library.png)
+
+Every opening belongs to one of three categories, and each shows how many you've learned.
+- **Beginner:** the 38 openings every player should know. You name the family, e.g. "Sicilian Defense".
+- **Intermediate:** 114 popular variations. You name the variation too, e.g. "Sicilian Defense: Najdorf Variation".
+- **Expert:** the other 3,025 named openings. You give the full name.
+
+An opening counts as **learned** once you've named it on the first try and played it without
+mistakes or hints. The **To learn** filter shows exactly what stands between you and
+completing a category. Openings you get wrong come back more often.
+
+### Make it yours
+
+![Brown board with the Celtic pieces](docs/screenshots/themes.png)
+
+- **Settings:** 7 piece sets, 5 board colours, animation speed, sound, legal-move dots and coordinates.
+- **Board marks:** right-click a square to mark it, or right-drag to draw an arrow, just like on chess.com.
+
+**Keyboard:**
+
+| Key | Does |
+|---|---|
+| `Enter` | submit the answer or go to the next opening |
+| `←` `→` `↑` `↓` | step through the moves |
+| `F` | flip the board |
+| `H` | hint (Play It) |
+| `1` `2` `3` | switch between Name It, Play It and Library |
+
+## Run from source
+
+You need [Node.js](https://nodejs.org/) 20 or newer.
+
+```
+git clone https://github.com/nokkiee/gambitguessr.git
+cd gambitguessr
+npm install
+npm start
+```
+
+| Command | Does |
+|---|---|
+| `npm test` | unit tests: answer checking and the whole opening dataset |
+| `npm run test:e2e` | drives the real app with mouse and keyboard and saves screenshots (Linux) |
+| `npm run dist` | builds the Linux AppImage and .deb into `dist/` |
+| `npm run dist:win` | builds the Windows installer and portable .exe (on Windows, or on Linux with Wine) |
+| `npm run data` | rebuilds `renderer/data/openings.json`; add `-- --fetch` to re-download from Lichess |
+| `npm run install-desktop` | adds the source version to your Linux app menu |
+
+Where things are:
+- `data/curated.js`: the hand-picked Beginner and Intermediate openings, with their nicknames and representative lines.
+- `renderer/js/grading.js`: decides whether a typed name is right.
+- `renderer/js/board.js`: the chessboard, covering drawing, animation, drag and drop, and arrows.
+- `renderer/js/modes/`: the three screens.
+
+Contributions are welcome, especially more nicknames, better representative lines,
+and more of the openings people actually play in the Beginner and Intermediate lists.
+
+## License
+
+GambitGuessr is free software under the [GNU GPL v3.0 or later](LICENSE).
+- **Opening data:** from [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings), public domain (CC0).
+- **Bundled pieces, font and libraries:** these keep their own free licenses, listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- **Not affiliated with chess.com or GeoGuessr:** it uses none of their artwork, sounds or code.
