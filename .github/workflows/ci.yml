@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1' # the unit tests don't need Electron itself
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  windows:
+    # Builds the Windows installer on real Windows and checks that it installs.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npx electron-builder --win nsis portable --publish never
+      - name: Install silently and check the app is there
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem dist\GambitGuessr-Setup-*.exe | Select-Object -First 1
+          Start-Process $setup.FullName -ArgumentList '/S' -Wait
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\GambitGuessr\GambitGuessr.exe'
+          if (-not (Test-Path $exe)) { throw "GambitGuessr.exe was not installed" }
+          Write-Host "Installed: $exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GambitGuessr-windows
+          path: dist/*.exe
+          retention-days: 7
