@@ -1,0 +1,99 @@
+{
+  "name": "gambitguessr",
+  "productName": "GambitGuessr",
+  "version": "1.0.0",
+  "description": "GambitGuessr: learn chess openings by naming them from the board or playing their moves.",
+  "main": "main.js",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "author": {
+    "name": "GambitGuessr contributors"
+  },
+  "homepage": "https://github.com/nokkiee/gambitguessr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nokkiee/gambitguessr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nokkiee/gambitguessr/issues"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "test": "node --test test/unit/*.test.js",
+    "test:e2e": "for s in smoke library layout; do electron test/e2e/harness.js test/e2e/scenarios/$s.js || exit 1; done",
+    "data": "node scripts/build-data.js",
+    "vendor": "node scripts/vendor.js",
+    "icons": "electron scripts/make-icon.js",
+    "install-desktop": "scripts/install-desktop.sh",
+    "dist": "electron-builder --linux AppImage deb",
+    "dist:win": "electron-builder --win nsis portable",
+    "pack": "electron-builder --linux dir"
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
+    "chess.js": "^1.4.0"
+  },
+  "build": {
+    "appId": "app.gambitguessr",
+    "productName": "GambitGuessr",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "renderer/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "asar": true,
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Game",
+      "icon": "build/icons",
+      "synopsis": "Chess opening trainer",
+      "desktop": {
+        "entry": {
+          "GenericName": "Chess Opening Trainer",
+          "Keywords": "chess;openings;opening;trainer;learn;",
+          "StartupWMClass": "gambitguessr"
+        }
+      },
+      "syncDesktopName": true,
+      "maintainer": "nokkiee <202015925+nokkiee@users.noreply.github.com>",
+      "executableName": "gambitguessr"
+    },
+    "deb": {
+      "packageCategory": "games"
+    },
+    "extraResources": [
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "licenses/**"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png",
+      "executableName": "GambitGuessr"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "shortcutName": "GambitGuessr",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-Portable.${ext}"
+    }
+  },
+  "desktopName": "gambitguessr.desktop"
+}
