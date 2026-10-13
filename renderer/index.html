@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GambitGuessr</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body class="loading">
+  <div class="app">
+    <nav class="sidebar">
+      <div class="logo">
+        <span class="logo-mark"></span>
+        <span class="logo-text">Gambit<span class="logo-accent">Guessr</span></span>
+      </div>
+      <div id="nav" class="nav"></div>
+      <div class="grow"></div>
+      <button type="button" id="btn-sound" class="nav-item small"></button>
+      <button type="button" id="btn-settings" class="nav-item small"></button>
+    </nav>
+
+    <main class="main">
+      <section class="board-col">
+        <div class="player" id="player-top">
+          <div class="p-avatar"></div>
+          <div class="p-info">
+            <div class="p-line"><span class="p-name"></span><span class="p-sub"></span></div>
+            <div class="p-captured"></div>
+          </div>
+          <div class="p-clock" hidden></div>
+        </div>
+        <div class="board-wrap"><div id="board"></div></div>
+        <div class="player" id="player-bottom">
+          <div class="p-avatar"></div>
+          <div class="p-info">
+            <div class="p-line"><span class="p-name"></span><span class="p-sub"></span></div>
+            <div class="p-captured"></div>
+          </div>
+          <div class="p-clock" hidden></div>
+        </div>
+      </section>
+      <aside class="panel" id="panel"></aside>
+    </main>
+  </div>
+
+  <dialog id="settings" class="dialog">
+    <div class="dlg-head">
+      <span>Settings</span>
+      <button type="button" class="dlg-close" title="Close (Esc)">✕</button>
+    </div>
+    <div class="dlg-body"></div>
+  </dialog>
+</body>
+</html>
