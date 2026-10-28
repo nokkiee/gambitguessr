@@ -24,6 +24,7 @@ export function categoryOf(o) {
 
 let all = [];
 let byEpd = new Map();
+let byName = new Map();
 // Opening names in other languages, from data/opening-names.json:
 // { "Sicilian Defense": { "pl": "Obrona sycylijska", "de": [...], ... }, ... }
 let localized = {};
@@ -33,10 +34,12 @@ export async function loadOpenings(data, names) {
   all = data || await (await fetch('data/openings.json')).json();
   localized = names || (data ? {} : await (await fetch('data/opening-names.json')).json());
   byEpd = new Map();
+  byName = new Map();
   for (const o of all) {
     o.title = o.display || o.name;
     o.parts = splitName(o.title);
     o.plies = o.moves.split(' ');
+    if (!byName.has(o.name)) byName.set(o.name, o);
     if (!byEpd.has(o.epd)) byEpd.set(o.epd, []);
     byEpd.get(o.epd).push(o);
   }
@@ -44,7 +47,7 @@ export async function loadOpenings(data, names) {
 }
 
 export const allOpenings = () => all;
-export const openingByName = (name) => all.find((o) => o.name === name);
+export const openingByName = (name) => byName.get(name);
 
 export function pool(level) {
   const { tiers } = LEVELS[level];

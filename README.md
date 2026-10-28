@@ -118,7 +118,10 @@ Your opponent's last move is played on the board, and you find the checkmate in 
 
 ![Library: Beginner, Intermediate and Expert categories with progress](docs/screenshots/library.png)
 
-Every opening belongs to one of three categories, and each shows how many you've learned.
+The Library has two shelves, **Openings** and **Mate puzzles**. Both are split into the same three
+categories, and each category shows how much of it you've done.
+
+**Openings:**
 - **Beginner:** the 38 openings every player should know. You name the family, e.g. "Sicilian Defense".
 - **Intermediate:** 114 popular variations. You name the variation too, e.g. "Sicilian Defense: Najdorf Variation".
 - **Expert:** the other 3,025 named openings. You give the full name.
@@ -126,6 +129,18 @@ Every opening belongs to one of three categories, and each shows how many you've
 An opening counts as **learned** once you've named it on the first try and played it without
 mistakes or hints. The **To learn** filter shows exactly what stands between you and
 completing a category. Openings you get wrong come back more often.
+
+![Library: the Mate It puzzles, with the famous traps first](docs/screenshots/library-mates.png)
+
+**Mate puzzles:** every Mate It puzzle, easiest first.
+- **Beginner:** the 9 famous opening traps and 950 puzzles rated under 1000.
+- **Intermediate:** 950 puzzles rated 1000–1599.
+- **Expert:** 887 puzzles rated 1600 and up.
+
+A puzzle counts as **solved** once you've found the mate on the first try without a hint.
+- **Find a puzzle:** search by opening (in any of the five languages), trap name or rating, or filter by **To solve** and **Solved**.
+- **Open a puzzle:** step through the moves that led to it, or reveal the mate. A revealed puzzle counts as tried, not solved.
+- **Solve it** opens that puzzle in Mate It.
 
 ### In your language
 

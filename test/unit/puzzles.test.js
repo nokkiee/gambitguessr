@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Chess } from '../../renderer/vendor/chess.js';
 import { loadOpenings } from '../../renderer/js/openings.js';
-import { loadPuzzles, puzzlePool, pickPuzzle, preparePuzzle } from '../../renderer/js/puzzles.js';
+import {
+  loadPuzzles, puzzlePool, pickPuzzle, preparePuzzle, puzzlesInCategory, puzzleLevel, puzzleOpening, puzzleSolver, puzzleMoveNumber,
+} from '../../renderer/js/puzzles.js';
 
 const read = (p) => JSON.parse(readFileSync(new URL(`../../renderer/data/${p}`, import.meta.url)));
 await loadOpenings(read('openings.json'), read('opening-names.json'));
@@ -43,5 +45,27 @@ test('famous traps are shown first, then new puzzles, never a recent one', () =>
     assert.ok(!recent.includes(p.id));
     seen.add(p.id);
     recent.push(p.id);
+  }
+});
+
+test('Library categories: every puzzle in exactly one, easiest first, traps under Beginner', () => {
+  const cats = ['beginner', 'intermediate', 'expert'].map((l) => puzzlesInCategory(l));
+  const ids = cats.flat().map((p) => p.id);
+  assert.equal(ids.length, data.puzzles.length + 9);
+  assert.equal(new Set(ids).size, ids.length, 'no puzzle in two categories');
+  assert.deepEqual(cats[0].slice(0, 9).map((p) => p.trap), data.traps.map((tr) => tr.id));
+  for (const [i, level] of ['beginner', 'intermediate', 'expert'].entries()) {
+    const rated = cats[i].filter((p) => !p.trap);
+    for (let k = 1; k < rated.length; k++) assert.ok(rated[k - 1].r <= rated[k].r, `${level} sorted by rating`);
+    for (const p of cats[i]) assert.equal(puzzleLevel(p), level);
+  }
+});
+
+test('Library labels match the prepared puzzle', () => {
+  for (const p of [...puzzlesInCategory('beginner'), ...puzzlesInCategory('expert')]) {
+    const q = preparePuzzle(p);
+    assert.equal(puzzleSolver(p), q.solver, `${p.id} solver`);
+    assert.equal(puzzleMoveNumber(p), q.moveNumber, `${p.id} move number`);
+    assert.equal(puzzleOpening(p), q.opening, `${p.id} opening`);
   }
 });

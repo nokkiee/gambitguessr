@@ -20,12 +20,13 @@ export class MateView {
     this.puzzle = null;
   }
 
-  enter() {
+  /** @param raw a puzzle picked in the Library, to solve now */
+  enter(raw) {
     const { board } = this.ctx;
     board.clearHint();
     board.clearBadges();
-    if (!this.puzzle || this.level !== settings.level || this.source !== settings.mateSource) {
-      this.next();
+    if (raw || !this.puzzle || this.level !== settings.level || this.source !== settings.mateSource) {
+      this.next(raw);
       return;
     }
     // Coming back: show the puzzle again, skipping any intro that was still playing.
@@ -53,14 +54,14 @@ export class MateView {
 
   // ---- puzzle lifecycle -----------------------------------------------------------------
 
-  next() {
+  next(chosen) {
     clearTimeout(this.timer);
     clearTimeout(this.wrongTimer);
     // Leaving a puzzle unsolved ends the streak.
     if (this.puzzle && this.phase !== 'done') this.session.streak = 0;
     this.level = settings.level;
     this.source = settings.mateSource;
-    const raw = pickPuzzle(this.level, this.source, this.recent, mateStatus);
+    const raw = chosen || pickPuzzle(this.level, this.source, this.recent, mateStatus);
     this.recent.push(raw.id);
     if (this.recent.length > 40) this.recent.shift();
     const p = (this.puzzle = preparePuzzle(raw));
@@ -252,7 +253,7 @@ export class MateView {
       p.trap && opening ? h('div', { class: 'op-local' }, local ? `${local} · ${opening}` : opening) : null,
       !p.trap && local ? h('div', { class: 'op-local' }, opening) : null,
       h('div', { class: 'target-meta' },
-        p.trap ? t('mate.trapLabel') : `${t('mate.moveN', { n: p.moveNumber })} · ${t('mate.rating', { r: p.rating })}`),
+        p.trap ? t('mate.trapLabel') : `${t('mate.moveN', { n: p.moveNumber })} · ${t('mate.rating', { r: String(p.rating) })}`),
       h('div', { class: 'progress' },
         h('div', { class: 'progress-bar' }, h('div', { class: 'progress-fill', style: `width:${(solved / pool.length) * 100}%` })),
         h('div', { class: 'progress-text' },

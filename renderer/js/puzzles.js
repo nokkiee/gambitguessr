@@ -6,10 +6,12 @@ import { namedAt, epdOf, checkedKing } from './openings.js';
 
 let data = { openings: [], puzzles: [], traps: [] };
 let named = [];
+let byLevel = {};
 const LV = { beginner: 'b', intermediate: 'i', expert: 'e' };
 
 export async function loadPuzzles(d) {
   data = d || await (await fetch('data/puzzles.json')).json();
+  byLevel = {};
   // Label each famous trap with the deepest named opening its line passes through.
   named = data.traps.map((tr) => {
     const chess = new Chess();
@@ -30,6 +32,41 @@ export function puzzlePool(level, source) {
   const lv = LV[level];
   const list = data.puzzles.filter((p) => p.lv === lv && (source !== 'traps' || p.t));
   return source === 'traps' ? [...named, ...list] : list;
+}
+
+/**
+ * Every puzzle of one level, for the Library: easiest first. The famous traps are listed
+ * under Beginner (in Mate It they appear in every level's "Opening traps").
+ */
+export function puzzlesInCategory(level) {
+  if (!byLevel[level]) {
+    const list = data.puzzles.filter((p) => p.lv === LV[level]).sort((a, b) => a.r - b.r || (a.id < b.id ? -1 : 1));
+    byLevel[level] = level === 'beginner' ? [...named, ...list] : list;
+  }
+  return byLevel[level];
+}
+
+/** The Library category of a puzzle: its level, and Beginner for the famous traps. */
+export function puzzleLevel(p) {
+  return p.trap ? 'beginner' : Object.keys(LV).find((k) => LV[k] === p.lv);
+}
+
+/** The opening the puzzle's game came from (or a famous trap's opening). */
+export function puzzleOpening(p) {
+  return p.trap ? p.opening : data.openings[p.o];
+}
+
+/** Who has to find the mate: 'w' or 'b'. */
+export function puzzleSolver(p) {
+  if (p.trap) return p.line.length % 2 ? 'w' : 'b';
+  return p.fen.split(' ')[1] === 'w' ? 'b' : 'w';
+}
+
+/** The move number of the mating move. */
+export function puzzleMoveNumber(p) {
+  if (p.trap) return Math.ceil(p.line.length / 2);
+  const [, turn, , , , full] = p.fen.split(' ');
+  return turn === 'b' ? Number(full) + 1 : Number(full);
 }
 
 /**
@@ -75,7 +112,7 @@ export function preparePuzzle(p) {
   return {
     id: p.id,
     trap: p.trap || null,
-    opening: p.trap ? p.opening : data.openings[p.o],
+    opening: puzzleOpening(p),
     rating: p.r || null,
     moveNumber: chess.moveNumber(),
     solver: chess.turn(),

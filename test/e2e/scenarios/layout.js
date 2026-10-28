@@ -3,21 +3,37 @@
 // and checks nothing spills out of the window.
 
 module.exports = async (H) => {
+  const fits = async (what, size) => {
+    const overflow = await H.js(`(() => {
+      const vw = innerWidth, vh = innerHeight;
+      return [...document.querySelectorAll('.board-col, .panel, .sidebar')]
+        .map((el) => el.getBoundingClientRect())
+        .some((r) => r.right > vw + 1 || r.bottom > vh + 1 || r.left < -1 || r.top < -1);
+    })()`);
+    H.assert(!overflow, `${what} fits in ${size}`);
+  };
   for (const [w, hgt] of [[960, 620], [1920, 1080]]) {
     H.win.setSize(w, hgt);
     await H.sleep(400);
     for (const view of ['name', 'play', 'mate', 'library']) {
       await H.click(`.nav-item[data-view="${view}"]`);
       await H.sleep(500);
-      const overflow = await H.js(`(() => {
-        const vw = innerWidth, vh = innerHeight;
-        return [...document.querySelectorAll('.board-col, .panel, .sidebar')]
-          .map((el) => el.getBoundingClientRect())
-          .some((r) => r.right > vw + 1 || r.bottom > vh + 1 || r.left < -1 || r.top < -1);
-      })()`);
-      H.assert(!overflow, `${view} fits in ${w}x${hgt}`);
+      await fits(view, `${w}x${hgt}`);
       await H.shot(`layout-${w}-${view}`);
     }
+    // The Library's puzzle shelf still leaves room for the list, and a puzzle's page fits.
+    await H.click('.lib-kinds .seg-opt[data-kind="mates"]');
+    await H.sleep(300);
+    await fits('puzzle shelf', `${w}x${hgt}`);
+    H.assert(await H.js(`document.querySelector('.op-list').clientHeight`) >= 120, `puzzle list has room at ${w}x${hgt}`);
+    await H.shot(`layout-${w}-library-mates`);
+    await H.click('.op-row');
+    await H.sleep(400);
+    await fits('puzzle page', `${w}x${hgt}`);
+    H.assert(await H.js(`(() => { const b = document.querySelector('.btn-primary').getBoundingClientRect(); return b.bottom <= innerHeight && b.height > 0; })()`), `Solve it visible at ${w}x${hgt}`);
+    await H.shot(`layout-${w}-library-puzzle`);
+    await H.click('.back-btn');
+    await H.click('.lib-kinds .seg-opt[data-kind="openings"]');
   }
 
   // Coming back to a screen restores its own board (orientation and position).

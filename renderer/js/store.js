@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS = {
   lang: null, // null: follow the system language
   level: 'beginner',
   mateSource: 'games', // 'games' or 'traps'
+  libraryKind: 'openings', // Library shelf: 'openings' or 'mates'
   playSide: 'auto',
   pieceSet: 'cburnett',
   boardTheme: 'green',

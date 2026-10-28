@@ -541,6 +541,11 @@ svg.icon { width: 20px; height: 20px; flex: none; display: block; }
 .cat-actions .link-btn:hover { color: var(--cat); }
 
 .lib-filter { align-self: flex-start; }
+.lib-kinds .seg-opt { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.lib-kinds svg.icon { width: 17px; height: 17px; flex: none; }
+.eco.eco-trap { display: grid; place-items: center; background: color-mix(in srgb, var(--amber) 22%, var(--btn)); color: var(--amber); }
+.eco.eco-trap svg.icon { width: 14px; height: 14px; }
+.detail-head .target-label { margin-bottom: 2px; }
 .seg-count { margin-left: 6px; font-size: 11px; color: var(--text-3); font-weight: 700; }
 .seg-opt.active .seg-count { color: var(--text-2); }
 .level-tag { color: var(--cat); font-weight: 800; }

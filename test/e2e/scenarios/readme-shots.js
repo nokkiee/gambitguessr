@@ -8,9 +8,10 @@ const DEMO_LEARNED = ['Italian Game', 'Ruy Lopez', 'Sicilian Defense', 'French D
 const ready = (H) => H.waitFor(() => H.js(`!document.body.classList.contains('loading')`));
 const movable = (H) => H.waitFor(() => H.js(`document.querySelectorAll('.pc.mine').length > 0`), 15000);
 const search = (H, q) => H.js(`(() => { const i = document.querySelector('.search-input'); i.value = ${JSON.stringify(q)}; i.dispatchEvent(new Event('input')); })()`);
-async function library(H, category, query) {
+async function library(H, category, query, kind = 'openings') {
   await H.click('.nav-item[data-view="library"]');
   if (await H.js(`!!document.querySelector('.back-btn')`)) await H.click('.back-btn');
+  await H.click(`.lib-kinds .seg-opt[data-kind="${kind}"]`);
   await H.click(`.cat-card`, category);
   await search(H, query || '');
   await H.sleep(200);
@@ -24,6 +25,15 @@ module.exports = async (H) => {
     localStorage.setItem('gambit.progress.v1', JSON.stringify(p));
     localStorage.setItem('gambit.records.v1', JSON.stringify({ nameStreak: 14, mateStreak: 9 }));
   })()`);
+  // Puzzles: four famous traps and the easiest rated Beginner puzzles solved, one trap tried.
+  await H.js(`(async () => {
+    const { puzzlesInCategory } = await import('./js/puzzles.js');
+    const m = {};
+    puzzlesInCategory('beginner').slice(0, 130).forEach((p, i) => { if (i < 4 || i >= 9) m[p.id] = 2; });
+    m['trap:englund'] = 1;
+    puzzlesInCategory('intermediate').slice(0, 25).forEach((p) => { m[p.id] = 2; });
+    localStorage.setItem('gambit.mate.v1', JSON.stringify(m));
+  })()`);
   await H.js(`location.reload()`);
   await H.sleep(400);
   await ready(H);
@@ -31,6 +41,10 @@ module.exports = async (H) => {
   // Library: categories with progress.
   await library(H, 'Beginner');
   await H.shot('library');
+
+  // Library: the Mate It puzzles, by category.
+  await library(H, 'Beginner', '', 'mates');
+  await H.shot('library-mates');
 
   // Name It: the Najdorf, named correctly.
   await library(H, 'Intermediate', 'Najdorf Variation');

@@ -123,20 +123,22 @@ export function lineEl(sans, max = 8) {
 
 /**
  * @param {HTMLElement} box
- * @param {{san: string[], current: number, onPick?: (ply: number) => void, placeholder?: string, hidden?: boolean}} o
+ * @param {{san: string[], current: number, onPick?: (ply: number) => void, placeholder?: string, hidden?: boolean, offset?: number}} o
  *   `current` is the number of plies shown on the board (0 = start position).
+ *   `offset` is the number of plies played before the first listed move (for a position
+ *   from the middle of a game); an odd offset starts the list with Black's move ("7. … ♘e7").
  */
-export function renderMoves(box, { san, current, onPick, placeholder, hidden }) {
+export function renderMoves(box, { san, current, onPick, placeholder, hidden, offset = 0 }) {
   box.replaceChildren();
   if (!san.length) {
     box.append(h('div', { class: 'moves-empty' }, placeholder || t('common.noMoves')));
     return;
   }
-  for (let i = 0; i < san.length; i += 2) {
-    const row = h('div', { class: 'move-row' }, h('span', { class: 'move-no' }, `${i / 2 + 1}.`));
+  for (let i = -(offset % 2); i < san.length; i += 2) {
+    const row = h('div', { class: 'move-row' }, h('span', { class: 'move-no' }, `${(offset + i) / 2 + 1}.`));
     for (const ply of [i, i + 1]) {
-      if (ply >= san.length) {
-        row.append(h('span', { class: 'move' }));
+      if (ply < 0 || ply >= san.length) {
+        row.append(h('span', { class: 'move' }, ply < 0 ? '…' : ''));
         continue;
       }
       const cell = h('span', {
