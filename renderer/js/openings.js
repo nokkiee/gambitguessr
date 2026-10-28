@@ -1,29 +1,20 @@
 // Opening data: loading, the per-level pools, and picking what to practise next.
 import { Chess } from '../vendor/chess.js';
 import { splitName } from './grading.js';
+import { lang, t } from './i18n.js';
 
 // Each level drills its own openings plus the easier levels' ones. In the Library every
 // opening belongs to exactly one category (its level), so "learn them all" is a clear goal.
+// Labels and descriptions are translated: t('level.<id>') and t('goal.<id>').
 export const LEVELS = {
-  beginner: {
-    label: 'Beginner', depth: 1, tiers: [1], color: '#81b64c',
-    goal: 'The essential openings every player should know. To learn one, name its family and play its moves.',
-  },
-  intermediate: {
-    label: 'Intermediate', depth: 2, tiers: [1, 2], color: '#4ba3e3',
-    goal: 'Popular variations of those openings. To learn one, name the opening and its variation, and play its moves.',
-  },
-  expert: {
-    label: 'Expert', depth: Infinity, tiers: null, color: '#b07ce8',
-    goal: 'Every other named opening. To learn one, give its full name and play its moves.',
-  },
+  beginner: { depth: 1, tiers: [1], color: '#81b64c' },
+  intermediate: { depth: 2, tiers: [1, 2], color: '#4ba3e3' },
+  expert: { depth: Infinity, tiers: null, color: '#b07ce8' },
 };
 
 /** What a Name It question asks for at a given depth. */
 export function askText(depth) {
-  if (depth === 1) return 'Name the opening family, e.g. “Sicilian Defense”.';
-  if (depth === 2) return 'Name the opening and its variation, e.g. “Sicilian Defense: Najdorf Variation”.';
-  return 'Give the full name, e.g. “Sicilian Defense: Najdorf Variation, English Attack”.';
+  return t(depth === 1 ? 'ask.family' : depth === 2 ? 'ask.variation' : 'ask.full');
 }
 
 /** The Library category (level) an opening belongs to. */
@@ -33,9 +24,14 @@ export function categoryOf(o) {
 
 let all = [];
 let byEpd = new Map();
+// Opening names in other languages, from data/opening-names.json:
+// { "Sicilian Defense": { "pl": "Obrona sycylijska", "de": [...], ... }, ... }
+let localized = {};
+const OTHER_LANGS = ['pl', 'de', 'es', 'fr'];
 
-export async function loadOpenings(data) {
+export async function loadOpenings(data, names) {
   all = data || await (await fetch('data/openings.json')).json();
+  localized = names || (data ? {} : await (await fetch('data/opening-names.json')).json());
   byEpd = new Map();
   for (const o of all) {
     o.title = o.display || o.name;
@@ -60,8 +56,8 @@ export function inCategory(level) {
   return all.filter((o) => categoryOf(o) === level);
 }
 
-// Every name that counts as a right answer for this opening's final position.
-export function acceptedNames(o) {
+/** The English names that count as right for this opening's final position (primary first). */
+export function englishNames(o) {
   const names = [o.title];
   for (const other of byEpd.get(o.epd) || [o]) {
     for (const n of [other.display, ...(other.aka || []), other.name]) {
@@ -69,6 +65,63 @@ export function acceptedNames(o) {
     }
   }
   return names;
+}
+
+function localList(name, code) {
+  const v = localized[name]?.[code];
+  return v ? (Array.isArray(v) ? v : [v]) : [];
+}
+
+// "Sicilian Defense: Najdorf Variation" in another language: the family (or a whole
+// standalone name like "Evans Gambit") is translated, the rest stays as it is.
+function translations(name, code) {
+  const whole = localList(name, code);
+  const family = splitName(name)[0];
+  const rest = name.startsWith(family) ? name.slice(family.length) : '';
+  const viaFamily = rest ? localList(family, code).map((f) => f + rest) : [];
+  return [...whole, ...viaFamily];
+}
+
+/** Every name that counts as a right answer, in English and in each translated language. */
+export function acceptedNames(o) {
+  const names = englishNames(o);
+  for (const n of [...names]) {
+    for (const code of OTHER_LANGS) {
+      for (const tr of translations(n, code)) if (!names.includes(tr)) names.push(tr);
+    }
+  }
+  return names;
+}
+
+/** The opening's family in the interface language ("Obrona sycylijska"), or null if not translated. */
+export function localFamily(o, code = lang) {
+  return localFamilyOf(o.title, code) || localFamilyOf(o.name, code);
+}
+
+/** Same, for an opening name given as text ("French Defense: Tarrasch Variation"). */
+export function localFamilyOf(name, code = lang) {
+  if (code === 'en' || !name) return null;
+  return localList(splitName(name)[0], code)[0] || null;
+}
+
+/** The opening's title with the family translated, for hints in the interface language. */
+export function localTitle(o, code = lang) {
+  const fam = localFamily(o, code);
+  return fam ? fam + o.title.slice(o.parts[0].length) : o.title;
+}
+
+/** Other names worth showing: English alternatives plus translations in the interface language. */
+export function displayAliases(o, code = lang) {
+  const out = englishNames(o).filter((n) => n !== o.title && n !== o.name);
+  if (code !== 'en') {
+    for (const n of englishNames(o)) for (const tr of translations(n, code)) if (!out.includes(tr)) out.push(tr);
+  }
+  return out;
+}
+
+/** Text to search in: every name in every language, the ECO code and the moves. */
+export function searchText(o) {
+  return [...acceptedNames(o), o.eco, o.moves].join(' ');
 }
 
 // Named openings reached by exactly this position (used to tell the player

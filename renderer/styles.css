@@ -321,7 +321,10 @@ svg.icon { width: 20px; height: 20px; flex: none; display: block; }
 .btn-danger { background: #4a2a26; color: #ff8a7a; box-shadow: 0 3px 0 #2a1714; }
 .btn-danger:hover { background: #5c322c; }
 .btn-danger:disabled { opacity: 0.6; cursor: default; }
-.btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+.btn-row.tight { flex-wrap: wrap; gap: 6px; }
+.btn-row.tight .btn-secondary svg.icon { display: none; }
+.btn-row.tight .btn { padding-left: 11px; padding-right: 11px; }
 
 .link-btn {
   border: 0; background: none; padding: 0;
@@ -699,4 +702,28 @@ svg.icon { width: 20px; height: 20px; flex: none; display: block; }
   .result { padding: 11px 12px; }
   .result-name { font-size: 16px; }
   .cat-goal { display: none; }
+}
+
+/* ---- moves in figurine notation, translated names, Mate It ------------------------------------ */
+
+.san { white-space: nowrap; }
+.fig {
+  display: inline-block;
+  width: 1.2em; height: 1.2em;
+  margin: 0 0.05em 0 -0.1em;
+  vertical-align: -0.24em;
+  background: center / contain no-repeat;
+}
+.coach-bubble .fig { filter: drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.6)); }
+.op-local { color: var(--text-3); font-size: 13px; font-weight: 700; margin-top: -2px; }
+.result .op-local, .detail-head .op-local { font-size: 14px; }
+.op-row-local { color: var(--text-2); font-weight: 600; }
+.mate-from { font-weight: 800; }
+.game-link { font-size: 13px; color: var(--text-2); }
+.game-link:hover { color: var(--green-hi); }
+.lang-seg { flex-wrap: wrap; }
+.lang-seg .seg-opt { flex: 1 1 auto; }
+.seg-opt { overflow: hidden; text-overflow: ellipsis; }
+@container (max-width: 390px) {
+  .seg-opt { padding: 7px 5px; font-size: 12px; }
 }

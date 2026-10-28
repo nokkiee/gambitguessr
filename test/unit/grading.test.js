@@ -78,3 +78,17 @@ test('helpers for hints', () => {
   assert.equal(requiredPart('Sicilian Defense: Najdorf Variation', 1), 'Sicilian Defense');
   assert.equal(letterHint("Queen's Gambit"), "Q____'s G_____");
 });
+
+test('translated opening names, Polish letters and German ß', async () => {
+  assert.equal(normalize('Gambit królewski przyjęty'), 'gambit krolewski przyjety');
+  assert.equal(normalize('Ruy López Łódź Straße'), 'ruy lopez lodz strasse');
+  const sicilianPl = ['Sicilian Defense: Najdorf Variation', 'Obrona sycylijska: Najdorf Variation'];
+  assert.equal(result('obrona sycylijska', sicilianPl, 1), 'correct');
+  assert.equal(result('sycylijska', sicilianPl, 1), 'correct');
+  assert.equal(result('Obrona sycylijska wariant Najdorfa', sicilianPl, 2), 'correct');
+  const sicilianDe = ['Sicilian Defense: Najdorf Variation', 'Sizilianische Verteidigung: Najdorf Variation'];
+  assert.equal(result('Sizilianisch Najdorf-Variante', sicilianDe, 2), 'correct');
+  assert.equal(result('Defensa siciliana', ['Sicilian Defense', 'Defensa siciliana'], 1), 'correct');
+  assert.equal(result('Défense sicilienne', ['Sicilian Defense', 'Défense sicilienne'], 1), 'correct');
+  assert.equal(result('obrona francuska', sicilianPl, 1), 'wrong');
+});

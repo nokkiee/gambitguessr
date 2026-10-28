@@ -154,6 +154,7 @@ export class Board {
    */
   setPosition(fen, { lastMove = null, check = null, animate = true } = {}) {
     this.fen = fen;
+    this.root.dataset.fen = fen; // handy for tests and debugging
     this.lastMove = lastMove;
     this.checkSquare = check;
     this.selected = null;

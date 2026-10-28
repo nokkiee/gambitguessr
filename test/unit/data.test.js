@@ -6,7 +6,8 @@ import { loadOpenings, acceptedNames, pool, replay, ownerSide, epdOf, LEVELS } f
 import { gradeAnswer, splitName } from '../../renderer/js/grading.js';
 
 const data = JSON.parse(readFileSync(new URL('../../renderer/data/openings.json', import.meta.url)));
-const all = await loadOpenings(data);
+const names = JSON.parse(readFileSync(new URL('../../renderer/data/opening-names.json', import.meta.url)));
+const all = await loadOpenings(data, names);
 
 test('the dataset is complete', () => {
   assert.ok(all.length > 3000);

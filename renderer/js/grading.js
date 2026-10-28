@@ -1,13 +1,24 @@
 // Grades a typed opening name against the accepted names for a position.
 // Pure functions only, so it can be unit-tested under Node.
 
+// "Opening"/"Game", "Defense" and "Attack" in every supported language (accents removed).
+const KIND = {
+  opening: 'opening', game: 'opening', debiut: 'opening', otwarcie: 'opening', partia: 'opening',
+  eroffnung: 'opening', partie: 'opening', spiel: 'opening', apertura: 'opening', partida: 'opening',
+  juego: 'opening', ouverture: 'opening', debut: 'opening',
+  defense: 'defense', obrona: 'defense', verteidigung: 'defense', defensa: 'defense',
+  attack: 'attack', atak: 'attack', angriff: 'attack', ataque: 'attack', attaque: 'attack',
+};
+
 // Words that may be left out or swapped freely ("Sicilian" = "Sicilian Defense").
 const GENERIC = new Set([
-  'opening', 'defense', 'game', 'variation', 'var', 'line', 'system', 'attack',
-  'the', 'of', 'a', 'an', 'and', 'with', 'in', 'on',
+  ...Object.keys(KIND),
+  'variation', 'var', 'line', 'system', 'the', 'of', 'a', 'an', 'and', 'with', 'in', 'on',
+  // The same little words in Polish, German, Spanish and French.
+  'wariant', 'linia', 'variante', 'linie', 'variacion', 'linea', 'sistema', 'ligne', 'systeme',
+  'w', 'z', 'der', 'die', 'das', 'des', 'den', 'dem', 'im', 'mit', 'und',
+  'de', 'del', 'la', 'el', 'los', 'las', 'con', 'y', 'le', 'les', 'du', 'avec', 'et', 'l', 'd',
 ]);
-
-const KIND = { opening: 'opening', game: 'opening', defense: 'defense', attack: 'attack' };
 
 const NUMBERS = { 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' };
 
@@ -28,8 +39,9 @@ const ALIASES = [
 
 export function normalize(text) {
   return String(text)
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase()
+    .replace(/ł/g, 'l').replace(/ß/g, 'ss')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/['’`´]/g, '')
     .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, ' ')
@@ -160,5 +172,5 @@ export function requiredPart(name, depth) {
 
 // "Sicilian Defense" -> "S_______ D______" style hint (keeps punctuation and short words).
 export function letterHint(text) {
-  return text.replace(/[A-Za-zÀ-ÿ]+/g, (w) => (w.length <= 2 ? w : w[0] + '_'.repeat(w.length - 1)));
+  return text.replace(/\p{L}+/gu, (w) => (w.length <= 2 ? w : w[0] + '_'.repeat(w.length - 1)));
 }

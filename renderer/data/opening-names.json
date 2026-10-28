@@ -1,0 +1,468 @@
+{
+ "Alekhine Defense": {
+  "pl": "Obrona Alechina",
+  "de": "Aljechin-Verteidigung",
+  "es": "Defensa Alekhine",
+  "fr": "Défense Alekhine"
+ },
+ "Amar Opening": {
+  "es": "Apertura París",
+  "fr": "Ouverture Amar"
+ },
+ "Anderssen's Opening": {
+  "de": "Anderssen-Eröffnung",
+  "es": "Apertura Anderssen",
+  "fr": "Ouverture Anderssen"
+ },
+ "Barnes Opening": {
+  "es": "Apertura Gedult",
+  "fr": "Ouverture Barnes"
+ },
+ "Benko Gambit": {
+  "pl": [
+   "Gambit wołżański",
+   "Gambit Benko"
+  ],
+  "de": [
+   "Wolga-Gambit",
+   "Benkö-Gambit"
+  ],
+  "es": [
+   "Gambito Volga",
+   "Gambito Benko"
+  ],
+  "fr": "Gambit Benko"
+ },
+ "Benoni Defense": {
+  "pl": "Obrona Benoni",
+  "de": "Benoni-Verteidigung",
+  "es": "Defensa Benoni",
+  "fr": "Défense Benoni"
+ },
+ "Bird Opening": {
+  "pl": "Debiut Birda",
+  "de": "Bird-Eröffnung",
+  "es": "Apertura Bird",
+  "fr": "Ouverture Bird"
+ },
+ "Bishop's Opening": {
+  "pl": "Debiut gońca",
+  "de": "Läuferspiel",
+  "es": "Apertura de alfil",
+  "fr": "Début du fou"
+ },
+ "Blackmar-Diemer Gambit": {
+  "de": "Blackmar-Diemer-Gambit",
+  "es": "Gambito Blackmar-Diemer",
+  "fr": "Gambit Blackmar-Diemer",
+  "pl": "Gambit Blackmara-Diemera"
+ },
+ "Bogo-Indian Defense": {
+  "pl": "Obrona Bogolubowa",
+  "de": "Bogoljubow-Indische Verteidigung",
+  "es": "Defensa Bogoindia",
+  "fr": "Défense Bogo-indienne"
+ },
+ "Bongcloud Attack": {
+  "pl": "Atak bongcloud",
+  "de": "Bongcloud-Angriff",
+  "fr": "Attaque Bongcloud",
+  "es": "Ataque Bongcloud"
+ },
+ "Budapest Gambit": {
+  "pl": "Gambit budapeszteński",
+  "de": "Budapester Gambit",
+  "es": "Gambito Budapest",
+  "fr": "Gambit de Budapest"
+ },
+ "Caro-Kann Defense": {
+  "pl": "Obrona Caro-Kann",
+  "de": "Caro-Kann-Verteidigung",
+  "es": "Defensa Caro-Kann",
+  "fr": "Défense Caro-Kann"
+ },
+ "Catalan Opening": {
+  "pl": "Partia katalońska",
+  "de": "Katalanische Eröffnung",
+  "es": "Apertura catalana",
+  "fr": "Partie catalane"
+ },
+ "Center Game": {
+  "pl": "Debiut centralny",
+  "de": "Mittelgambit",
+  "es": "Apertura del centro",
+  "fr": "Partie du centre"
+ },
+ "Clemenz Opening": {
+  "es": "Apertura Clemenz",
+  "fr": "Ouverture Clemenz"
+ },
+ "Colle System": {
+  "de": "Colle-System",
+  "es": "Sistema Colle",
+  "fr": "Système Colle",
+  "pl": "System Colle'a"
+ },
+ "Danish Gambit": {
+  "pl": "Gambit północny",
+  "de": "Nordisches Gambit",
+  "es": "Gambito danés",
+  "fr": "Gambit danois"
+ },
+ "Dutch Defense": {
+  "pl": "Obrona holenderska",
+  "de": "Holländische Verteidigung",
+  "es": "Defensa holandesa",
+  "fr": "Défense hollandaise"
+ },
+ "Elephant Gambit": {
+  "pl": "Gambit słonia",
+  "de": "Mittelgambit im Nachzug",
+  "es": "Gambito elefante",
+  "fr": "Gambit éléphant"
+ },
+ "English Defense": {
+  "pl": "Obrona angielska",
+  "fr": "Défense anglaise"
+ },
+ "English Opening": {
+  "pl": "Partia angielska",
+  "de": "Englische Eröffnung",
+  "es": "Apertura inglesa",
+  "fr": "Ouverture anglaise"
+ },
+ "Englund Gambit": {
+  "de": "Englund-Gambit",
+  "es": "Gambito Englund",
+  "fr": "Gambit Englund",
+  "pl": "Gambit Englunda"
+ },
+ "Evans Gambit": {
+  "pl": "Gambit Evansa",
+  "de": "Evansgambit",
+  "es": "Gambito Evans",
+  "fr": "Gambit Evans"
+ },
+ "Four Knights Game": {
+  "pl": "Obrona czterech skoczków",
+  "de": "Vierspringerspiel",
+  "es": "Apertura de los cuatro caballos",
+  "fr": "Partie des quatre cavaliers"
+ },
+ "French Defense": {
+  "pl": "Obrona francuska",
+  "de": "Französische Verteidigung",
+  "es": "Defensa francesa",
+  "fr": "Défense française"
+ },
+ "Giuoco Piano": {
+  "pl": "Giuoco piano",
+  "de": "Giuoco Piano",
+  "es": "Giuoco piano",
+  "fr": "Giuoco piano"
+ },
+ "Grob Opening": {
+  "pl": "Atak Groba",
+  "de": "Grobs Angriff",
+  "es": "Ataque Grob",
+  "fr": "Début Grob"
+ },
+ "Grünfeld Defense": {
+  "pl": "Obrona Grünfelda",
+  "de": "Grünfeld-Indische Verteidigung",
+  "es": "Defensa Grünfeld",
+  "fr": "Défense Grünfeld"
+ },
+ "Gunderam Defense": {
+  "fr": "Défense brésilienne"
+ },
+ "Hippopotamus Defense": {
+  "de": "Hippopotamus-Eröffnung",
+  "es": "Defensa hipopótamo",
+  "fr": "Défense hippopotame"
+ },
+ "Indian Defense": {
+  "pl": "Obrona indyjska",
+  "de": "Indische Verteidigung",
+  "es": "Defensa india",
+  "fr": "Défense indienne"
+ },
+ "Italian Game": {
+  "es": "Apertura italiana",
+  "fr": "Partie italienne",
+  "pl": "Partia włoska",
+  "de": "Italienische Partie"
+ },
+ "King's Gambit": {
+  "pl": "Gambit królewski",
+  "de": "Königsgambit",
+  "es": "Gambito de rey",
+  "fr": "Gambit du roi"
+ },
+ "King's Gambit Accepted": {
+  "pl": "Gambit królewski przyjęty",
+  "de": "Angenommenes Königsgambit",
+  "es": "Gambito de rey aceptado",
+  "fr": "Gambit du roi accepté"
+ },
+ "King's Gambit Declined": {
+  "pl": "Gambit królewski odrzucony",
+  "de": "Abgelehntes Königsgambit",
+  "es": "Gambito de rey rehusado",
+  "fr": "Gambit du roi refusé"
+ },
+ "King's Indian Attack": {
+  "de": "Königsindischer Angriff",
+  "es": "Ataque indio de rey",
+  "fr": "Attaque est-indienne",
+  "pl": "Atak królewsko-indyjski"
+ },
+ "King's Indian Defense": {
+  "pl": "Obrona królewsko-indyjska",
+  "de": "Königsindische Verteidigung",
+  "es": "Defensa india de rey",
+  "fr": "Défense est-indienne"
+ },
+ "Latvian Gambit": {
+  "pl": "Gambit łotewski",
+  "de": "Lettisches Gambit",
+  "es": "Gambito letón",
+  "fr": "Gambit letton"
+ },
+ "London System": {
+  "pl": "System londyński",
+  "de": "Londoner System",
+  "es": "Sistema Londres",
+  "fr": "Système de Londres"
+ },
+ "Mieses Opening": {
+  "de": "Mieses-Eröffnung",
+  "es": "Apertura Mieses",
+  "fr": "Ouverture indienne ancienne"
+ },
+ "Modern Defense": {
+  "pl": "Obrona Robatscha",
+  "de": "Moderne Verteidigung",
+  "es": "Defensa moderna",
+  "fr": "Défense moderne"
+ },
+ "Nimzo-Indian Defense": {
+  "pl": "Obrona Nimzowitscha",
+  "de": "Nimzowitsch-Indische Verteidigung",
+  "es": "Defensa Nimzo-India",
+  "fr": "Défense nimzo-indienne"
+ },
+ "Nimzo-Larsen Attack": {
+  "pl": "Debiut Larsena",
+  "de": "Larsen-System",
+  "es": "Apertura Larsen",
+  "fr": "Début Larsen"
+ },
+ "Nimzowitsch Defense": {
+  "pl": "Debiut Nimzowitscha",
+  "de": "Nimzowitsch-Verteidigung",
+  "es": "Defensa Nimzowitsch",
+  "fr": "Défense Nimzowitsch"
+ },
+ "Old Indian Defense": {
+  "de": "Altindische Verteidigung",
+  "es": "Defensa india antigua",
+  "fr": "Défense vieille-indienne",
+  "pl": "Obrona staroindyjska"
+ },
+ "Petrov's Defense": {
+  "pl": [
+   "Obrona rosyjska",
+   "Obrona Pietrowa"
+  ],
+  "de": [
+   "Russische Verteidigung",
+   "Petrow-Verteidigung"
+  ],
+  "es": [
+   "Defensa Petrov",
+   "Defensa rusa"
+  ],
+  "fr": [
+   "Défense russe",
+   "Défense Petrov"
+  ]
+ },
+ "Philidor Defense": {
+  "pl": "Obrona Philidora",
+  "de": "Philidor-Verteidigung",
+  "es": "Defensa Philidor",
+  "fr": "Défense Philidor"
+ },
+ "Pirc Defense": {
+  "pl": "Obrona Pirca",
+  "de": "Pirc-Ufimzew-Verteidigung",
+  "es": "Defensa Pirc",
+  "fr": "Défense Pirc"
+ },
+ "Polish Defense": {
+  "pl": "Obrona polska",
+  "de": "Polnische Verteidigung",
+  "fr": "Défense polonaise"
+ },
+ "Polish Opening": {
+  "pl": "Debiut Sokolskiego",
+  "de": [
+   "Sokolski-Eröffnung",
+   "Polnische Eröffnung"
+  ],
+  "es": [
+   "Apertura Sokolsky",
+   "Apertura polaca"
+  ],
+  "fr": [
+   "Ouverture polonaise",
+   "Ouverture de l'orang-outang"
+  ]
+ },
+ "Ponziani Opening": {
+  "pl": "Debiut Ponzianiego",
+  "de": "Ponziani-Eröffnung",
+  "es": "Apertura Ponziani",
+  "fr": "Début Ponziani"
+ },
+ "Portuguese Opening": {
+  "de": "Portugiesische Eröffnung",
+  "fr": "Ouverture portugaise"
+ },
+ "Queen's Gambit": {
+  "pl": "Gambit hetmański",
+  "de": "Damengambit",
+  "es": "Gambito de dama",
+  "fr": "Gambit dame"
+ },
+ "Queen's Gambit Accepted": {
+  "de": "Angenommenes Damengambit",
+  "fr": "Gambit dame accepté",
+  "pl": "Gambit hetmański przyjęty",
+  "es": "Gambito de dama aceptado"
+ },
+ "Queen's Gambit Declined": {
+  "de": "Abgelehntes Damengambit",
+  "es": [
+   "Gambito de dama declinado",
+   "Gambito de dama rehusado"
+  ],
+  "fr": "Gambit dame refusé",
+  "pl": "Gambit hetmański odrzucony"
+ },
+ "Queen's Indian Defense": {
+  "pl": "Obrona hetmańsko-indyjska",
+  "de": "Damenindische Verteidigung",
+  "es": "Defensa india de dama",
+  "fr": "Défense ouest-indienne"
+ },
+ "Queen's Pawn Game": {
+  "de": "Damenbauernspiel",
+  "es": "Apertura de peón de dama",
+  "fr": "Ouverture du pion dame",
+  "pl": "Otwarcie pionem hetmańskim"
+ },
+ "Richter-Veresov Attack": {
+  "de": "Weressow-Eröffnung",
+  "es": "Apertura Veresov",
+  "fr": "Attaque Richter-Veressov",
+  "pl": "Atak Richtera-Wieriesowa"
+ },
+ "Ruy Lopez": {
+  "pl": [
+   "Partia hiszpańska",
+   "Ruy Lopez"
+  ],
+  "de": "Spanische Partie",
+  "es": "Apertura española",
+  "fr": "Partie espagnole"
+ },
+ "Réti Opening": {
+  "pl": "Otwarcie Rétiego",
+  "de": "Réti-Eröffnung",
+  "es": "Apertura Réti",
+  "fr": "Début Réti"
+ },
+ "Saragossa Opening": {
+  "de": "Saragossa-Eröffnung",
+  "es": "Apertura Zaragoza",
+  "fr": "Ouverture de Saragosse"
+ },
+ "Scandinavian Defense": {
+  "pl": "Obrona skandynawska",
+  "de": "Skandinavische Verteidigung",
+  "es": "Defensa escandinava",
+  "fr": "Défense scandinave"
+ },
+ "Scotch Game": {
+  "pl": "Partia szkocka",
+  "de": "Schottische Partie",
+  "es": "Apertura escocesa",
+  "fr": "Partie écossaise"
+ },
+ "Semi-Slav Defense": {
+  "de": "Halbslawische Verteidigung",
+  "es": "Defensa semieslava",
+  "fr": "Défense semi-slave",
+  "pl": "Obrona półsłowiańska"
+ },
+ "Sicilian Defense": {
+  "pl": "Obrona sycylijska",
+  "de": "Sizilianische Verteidigung",
+  "es": "Defensa siciliana",
+  "fr": "Défense sicilienne"
+ },
+ "Slav Defense": {
+  "pl": "Obrona słowiańska",
+  "de": "Slawische Verteidigung",
+  "es": "Defensa eslava",
+  "fr": "Défense slave"
+ },
+ "St. George Defense": {
+  "de": "Baker-Verteidigung",
+  "es": "Defensa St. George",
+  "fr": "Défense Saint-Georges"
+ },
+ "Tarrasch Defense": {
+  "de": "Tarrasch-Verteidigung",
+  "es": "Defensa Tarrasch",
+  "fr": "Défense Tarrasch",
+  "pl": "Obrona Tarrasza"
+ },
+ "Torre Attack": {
+  "pl": "Atak Torre",
+  "de": "Torre-Angriff",
+  "es": "Ataque Torre",
+  "fr": "Attaque Torre"
+ },
+ "Trompowsky Attack": {
+  "pl": "Atak Trompowskiego",
+  "de": "Trompowsky-Eröffnung",
+  "es": "Ataque Trompowsky",
+  "fr": "Attaque Trompowsky"
+ },
+ "Two Knights Defense": {
+  "pl": "Obrona dwóch skoczków",
+  "de": "Zweispringerspiel im Nachzuge",
+  "es": "Defensa de los dos caballos",
+  "fr": "Défense des deux cavaliers"
+ },
+ "Vienna Game": {
+  "pl": "Partia wiedeńska",
+  "de": "Wiener Partie",
+  "es": "Apertura vienesa",
+  "fr": "Partie viennoise"
+ },
+ "Wade Defense": {
+  "fr": "Défense Wade"
+ },
+ "Ware Opening": {
+  "de": "Ware-Eröffnung",
+  "es": "Apertura Ware",
+  "fr": "Ouverture Ware"
+ },
+ "Zukertort Opening": {
+  "es": "Apertura Zukertort"
+ }
+}

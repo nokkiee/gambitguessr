@@ -6,7 +6,7 @@ module.exports = async (H) => {
   for (const [w, hgt] of [[960, 620], [1920, 1080]]) {
     H.win.setSize(w, hgt);
     await H.sleep(400);
-    for (const view of ['name', 'play', 'library']) {
+    for (const view of ['name', 'play', 'mate', 'library']) {
       await H.click(`.nav-item[data-view="${view}"]`);
       await H.sleep(500);
       const overflow = await H.js(`(() => {

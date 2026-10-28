@@ -11,6 +11,8 @@ const OUT = process.env.SHOT_DIR || path.join(os.tmpdir(), 'gambitguessr-shots')
 fs.mkdirSync(OUT, { recursive: true });
 
 const { app } = require('electron');
+// Tests read English labels, whatever the computer's language is (E2E_LANG overrides).
+app.commandLine.appendSwitch('lang', process.env.E2E_LANG || 'en-US');
 const main = require('../../main.js');
 
 function waitFor(fn, ms = 10000, step = 50) {

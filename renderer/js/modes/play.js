@@ -4,10 +4,10 @@ import { Chess } from '../../vendor/chess.js';
 import { pickNext, replay, ownerSide, namedAt, epdOf, checkedKing } from '../openings.js';
 import { settings, setSetting, stats, record } from '../store.js';
 import { play, playMove } from '../sound.js';
-import { h, icon, button, nameEl, renderMoves, navBar, showPly, setPlayers, formatClock } from '../ui.js';
+import { t, tNodes } from '../i18n.js';
+import { h, icon, button, nameEl, localNameEl, sanEl, renderMoves, navBar, showPly, setPlayers, formatClock } from '../ui.js';
 
-const PIECE = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' };
-const SIDES = [['auto', 'Auto'], ['w', 'White'], ['b', 'Black'], ['both', 'Both']];
+const SIDES = [['auto', 'side.auto'], ['w', 'side.white'], ['b', 'side.black'], ['both', 'side.both']];
 const REPLY_DELAY = 450;
 const WRONG_SHOW_MS = 750;
 
@@ -31,6 +31,11 @@ export class PlayView {
         this.advance();
       }
     }
+  }
+
+  /** Redraws the panel, e.g. after the interface language changed. */
+  refresh() {
+    this.render();
   }
 
   leave() {
@@ -64,7 +69,7 @@ export class PlayView {
     this.locked = false;
     this.phase = 'playing';
     this.side = settings.playSide === 'auto' ? ownerSide(o) : settings.playSide;
-    this.coach = { kind: 'info', text: this.introText() };
+    this.coach = this.introCoach();
     this.elapsed = 0;
     const { board } = this.ctx;
     board.clearBadges();
@@ -76,10 +81,9 @@ export class PlayView {
     this.advance();
   }
 
-  introText() {
-    const yours = this.userPlies();
-    const sideName = this.side === 'both' ? 'both sides' : this.side === 'w' ? 'White' : 'Black';
-    return `Play ${yours} ${yours === 1 ? 'move' : 'moves'} as ${sideName}.` + (this.side !== 'both' ? ' I\'ll answer with the book moves.' : '');
+  introCoach() {
+    const key = this.side === 'both' ? 'play.introBoth' : this.side === 'w' ? 'play.introWhite' : 'play.introBlack';
+    return { kind: 'info', key, vars: { n: this.userPlies() }, extra: this.side === 'both' ? null : 'play.introBook' };
   }
 
   userPlies() {
@@ -157,7 +161,7 @@ export class PlayView {
       this.showLive(m);
       playMove(m, this.chess.inCheck());
       board.showBadge(to, 'correct');
-      this.coach = { kind: 'good', text: this.ply >= this.line.moves.length ? 'That\'s the line!' : pick(GOOD) };
+      this.coach = { kind: 'good', key: this.ply >= this.line.moves.length ? 'play.lineDone' : `play.good.${1 + Math.floor(Math.random() * 5)}` };
       this.renderCoach();
       this.renderProgress();
       this.advance();
@@ -174,12 +178,12 @@ export class PlayView {
     let badge = 'wrong';
     if (later) {
       badge = 'order';
-      this.coach = { kind: 'warn', text: `${m.san} is part of this line, but not yet. What comes first?` };
+      this.coach = { kind: 'warn', key: 'play.later', san: m.san };
     } else if (named.length) {
       badge = 'book';
-      this.coach = { kind: 'warn', text: `${m.san} is a book move. It leads to the ${named[0].display || named[0].name}, which is a different line.` };
+      this.coach = { kind: 'warn', key: 'play.book', san: m.san, vars: { name: named[0].display || named[0].name } };
     } else {
-      this.coach = { kind: 'bad', text: `${m.san} isn't the move here. Try again.` };
+      this.coach = { kind: 'bad', key: 'play.wrong', san: m.san };
     }
     this.locked = true;
     board.setMovable(null);
@@ -207,10 +211,10 @@ export class PlayView {
     const { board } = this.ctx;
     if (this.hintStage === 1) {
       board.setHint({ squares: [m.from] });
-      this.coach = { kind: 'info', text: `Move your ${PIECE[m.piece]}.` };
+      this.coach = { kind: 'info', key: `play.hint.${m.piece}` };
     } else {
       board.setHint({ squares: [m.from], arrows: [[m.from, m.to]] });
-      this.coach = { kind: 'info', text: `Play ${m.san}.` };
+      this.coach = { kind: 'info', key: 'play.playMove', san: m.san };
     }
     this.renderCoach();
     this.renderProgress();
@@ -222,7 +226,7 @@ export class PlayView {
     const m = this.line.moves[this.ply];
     this.hints++;
     this.ctx.board.clearHint();
-    this.coach = { kind: 'info', text: `The move was ${m.san}.` };
+    this.coach = { kind: 'info', key: 'play.moveWas', san: m.san };
     this.applyBookMove(true);
     this.ctx.board.setHint({ arrows: [[m.from, m.to]] });
     this.renderCoach();
@@ -236,9 +240,7 @@ export class PlayView {
     const clean = this.mistakes === 0 && this.hints === 0;
     record(this.opening.name, 'play', clean);
     play('complete');
-    this.coach = clean
-      ? { kind: 'good', text: 'Perfect, no mistakes and no hints!' }
-      : { kind: 'info', text: 'Done! Play it again without help to make it stick.' };
+    this.coach = { kind: clean ? 'good' : 'info', key: clean ? 'play.perfect' : 'play.done' };
     this.render();
   }
 
@@ -264,14 +266,14 @@ export class PlayView {
     const side = this.side;
     const userColor = side === 'both' ? (this.ctx.board.orientation === 'white' ? 'w' : 'b') : side;
     const you = {
-      name: 'You',
-      sub: side === 'both' ? 'Playing both sides' : `Playing ${side === 'w' ? 'White' : 'Black'}`,
+      name: t('common.you'),
+      sub: t(side === 'both' ? 'play.playingBoth' : side === 'w' ? 'play.playingWhite' : 'play.playingBlack'),
       avatar: 'av-you', color: userColor,
       clock: formatClock(this.elapsed), clockActive: this.phase === 'playing',
     };
     const book = side === 'both'
-      ? { name: 'You', sub: 'Playing both sides', avatar: 'av-you', color: userColor === 'w' ? 'b' : 'w' }
-      : { name: 'Opening Book', sub: 'Plays the book moves', avatar: 'av-book', color: userColor === 'w' ? 'b' : 'w' };
+      ? { name: t('common.you'), sub: t('play.playingBoth'), avatar: 'av-you', color: userColor === 'w' ? 'b' : 'w' }
+      : { name: t('play.bookName'), sub: t('play.bookSub'), avatar: 'av-book', color: userColor === 'w' ? 'b' : 'w' };
     setPlayers(this.ctx.bars, { fen: this.ctx.board.fen, top: book, bottom: you });
   }
 
@@ -285,39 +287,40 @@ export class PlayView {
       ...SIDES.map(([value, label]) => h('button', {
         type: 'button',
         class: 'seg-opt' + (settings.playSide === value ? ' active' : ''),
-        title: value === 'auto' ? 'Play the side whose move gives the opening its name' : null,
+        title: value === 'auto' ? t('side.autoTitle') : null,
         onclick: () => { setSetting('playSide', value); this.start(this.opening); },
-      }, label)));
+      }, t(label))));
 
     const target = h('div', { class: 'target' },
-      h('div', { class: 'target-label' }, this.phase === 'done' ? 'You played' : 'Play the'),
+      h('div', { class: 'target-label' }, t(this.phase === 'done' ? 'play.youPlayed' : 'play.playThe')),
       h('div', { class: 'target-name' }, nameEl(o)),
+      localNameEl(o),
       h('div', { class: 'target-meta' }, `ECO ${o.eco}`),
       this.$progress);
 
     const actions = this.phase === 'playing'
       ? h('div', { class: 'btn-row' },
-        button('Hint', { iconName: 'hint', onclick: () => this.hint() }),
-        button('Show move', { iconName: 'eye', onclick: () => this.showMove() }),
+        button(t('common.hint'), { iconName: 'hint', onclick: () => this.hint() }),
+        button(t('play.showMove'), { iconName: 'eye', onclick: () => this.showMove() }),
         h('div', { class: 'grow' }),
-        button('Skip', { iconName: 'arrowRight', onclick: () => this.start(), cls: 'icon-right' }))
+        button(t('common.skip'), { iconName: 'arrowRight', onclick: () => this.start(), cls: 'icon-right' }))
       : h('div', { class: 'btn-row' },
-        button('Retry', { iconName: 'retry', onclick: () => this.start(o) }),
-        button('Name it', { iconName: 'name', onclick: () => this.ctx.go('name', o) }),
+        button(t('common.retry'), { iconName: 'retry', onclick: () => this.start(o) }),
+        button(t('common.nameIt'), { iconName: 'name', onclick: () => this.ctx.go('name', o) }),
         h('div', { class: 'grow' }),
-        button('Next', { kind: 'primary', iconName: 'arrowRight', onclick: () => this.start(), cls: 'icon-right' }));
+        button(t('common.next'), { kind: 'primary', iconName: 'arrowRight', onclick: () => this.start(), cls: 'icon-right' }));
 
     const body = h('div', { class: 'panel-body' },
       this.ctx.levelPicker(() => this.start()),
-      h('div', { class: 'row-between' }, h('span', { class: 'label' }, 'You play'), sideSeg),
+      h('div', { class: 'row-between' }, h('span', { class: 'label' }, t('play.youPlay')), sideSeg),
       target,
       this.$coach,
-      h('div', { class: 'moves-card' }, h('div', { class: 'moves-head' }, h('span', {}, 'Moves')), this.$moves),
+      h('div', { class: 'moves-card' }, h('div', { class: 'moves-head' }, h('span', {}, t('common.moves'))), this.$moves),
       this.phase === 'done' ? this.summaryEl() : null,
       actions);
 
     this.ctx.panel.replaceChildren(
-      this.ctx.panelHead('play', 'Play the Opening'),
+      this.ctx.panelHead('play', t('play.title')),
       body,
       navBar({
         first: () => this.view(0), prev: () => this.view(this.viewPly - 1),
@@ -333,18 +336,14 @@ export class PlayView {
   summaryEl() {
     const clean = this.mistakes === 0 && this.hints === 0;
     return h('div', { class: `summary ${clean ? 'clean' : ''}` },
-      h('div', { class: 'sum-item', html: `<b>${this.mistakes}</b><span>${this.mistakes === 1 ? 'Mistake' : 'Mistakes'}</span>` }),
-      h('div', { class: 'sum-item', html: `<b>${this.hints}</b><span>${this.hints === 1 ? 'Hint' : 'Hints'}</span>` }),
-      h('div', { class: 'sum-item', html: `<b>${formatClock(this.elapsed)}</b><span>Time</span>` }));
+      h('div', { class: 'sum-item' }, h('b', {}, String(this.mistakes)), h('span', {}, t('play.sumMistakes', { n: this.mistakes }))),
+      h('div', { class: 'sum-item' }, h('b', {}, String(this.hints)), h('span', {}, t('play.sumHints', { n: this.hints }))),
+      h('div', { class: 'sum-item' }, h('b', {}, formatClock(this.elapsed)), h('span', {}, t('play.sumTime'))));
   }
 
   renderCoach() {
     if (!this.$coach) return;
-    const c = this.coach || { kind: 'info', text: '' };
-    const iconName = { good: 'check', bad: 'cross', warn: 'half', info: 'book' }[c.kind];
-    this.$coach.replaceChildren(
-      h('div', { class: 'coach-avatar av-book' }),
-      h('div', { class: `coach-bubble coach-${c.kind}`, html: icon(iconName) }, h('span', {}, c.text)));
+    this.$coach.replaceChildren(...coachEls(this.coach));
   }
 
   renderProgress() {
@@ -355,8 +354,8 @@ export class PlayView {
     this.$progress.replaceChildren(
       h('div', { class: 'progress-bar' }, h('div', { class: 'progress-fill', style: `width:${pct}%` })),
       h('div', { class: 'progress-text' },
-        h('span', {}, `${done} of ${total} ${total === 1 ? 'move' : 'moves'}`),
-        h('span', { class: this.mistakes ? 'bad' : '' }, `${this.mistakes} ${this.mistakes === 1 ? 'mistake' : 'mistakes'}`)));
+        h('span', {}, t('play.progress', { done, n: total })),
+        h('span', { class: this.mistakes ? 'bad' : '' }, t('play.mistakes', { n: this.mistakes }))));
   }
 
   renderMoveList() {
@@ -365,7 +364,7 @@ export class PlayView {
       san: this.line.moves.slice(0, this.ply).map((m) => m.san),
       current: this.viewPly,
       onPick: (n) => this.view(n),
-      placeholder: this.isUserColor('w') ? 'Make the first move' : 'Waiting for White…',
+      placeholder: t(this.isUserColor('w') ? 'play.makeFirst' : 'play.waitWhite'),
     });
   }
 
@@ -394,5 +393,19 @@ export class PlayView {
   }
 }
 
-const GOOD = ['Correct!', 'Nice, that\'s the book move.', 'Right!', 'Exactly.', 'Good move.'];
-const pick = (list) => list[Math.floor(Math.random() * list.length)];
+/**
+ * The coach's avatar and speech bubble. A message is { kind, key, vars?, san?, extra? }:
+ * `san` is shown as the {move} placeholder in figurine notation, `extra` is a second sentence.
+ */
+export function coachEls(c) {
+  const iconName = { good: 'check', bad: 'cross', warn: 'half', info: 'book' }[c?.kind || 'info'];
+  const text = h('span', {});
+  if (c?.key) {
+    text.append(tNodes(c.key, { ...c.vars, ...(c.san ? { move: sanEl(c.san) } : {}) }));
+    if (c.extra) text.append(' ', t(c.extra));
+  }
+  return [
+    h('div', { class: 'coach-avatar av-book' }),
+    h('div', { class: `coach-bubble coach-${c?.kind || 'info'}`, html: icon(iconName) }, text),
+  ];
+}

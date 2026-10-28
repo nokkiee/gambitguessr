@@ -4,7 +4,9 @@ const SETTINGS_KEY = 'gambit.settings.v1';
 const PROGRESS_KEY = 'gambit.progress.v1';
 
 export const DEFAULT_SETTINGS = {
+  lang: null, // null: follow the system language
   level: 'beginner',
+  mateSource: 'games', // 'games' or 'traps'
   playSide: 'auto',
   pieceSet: 'cburnett',
   boardTheme: 'green',
@@ -83,6 +85,21 @@ export function mastery(name) {
 export function resetProgress() {
   progress = {};
   write(PROGRESS_KEY, progress);
+  mates = {};
+  write(MATE_KEY, mates);
+}
+
+// Mate It: puzzle id -> 2 (solved on the first try, no hints) or 1 (tried).
+const MATE_KEY = 'gambit.mate.v1';
+let mates = read(MATE_KEY, {});
+
+export function mateStatus(id) {
+  return mates[id] || 0;
+}
+
+export function recordMate(id, clean) {
+  mates[id] = clean ? 2 : Math.max(mates[id] || 0, 1);
+  write(MATE_KEY, mates);
 }
 
 // Small all-time records (best streaks).

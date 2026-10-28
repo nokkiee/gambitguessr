@@ -28,7 +28,7 @@ module.exports = async (H) => {
   }, 15000, 600);
   await H.shot('01-name-question');
 
-  const sanList = await H.js(`[...document.querySelectorAll('.moves .move')].map((e) => e.textContent).filter(Boolean)`);
+  const sanList = await H.js(`[...document.querySelectorAll('.moves .move .san')].map((e) => e.dataset.san)`);
   const asked = await lineFor(H, { sanList });
   H.assert(asked, `opening for ${sanList.join(' ')} not found`);
 

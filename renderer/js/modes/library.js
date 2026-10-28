@@ -1,17 +1,17 @@
 // "Library": browse and search every opening, step through its moves, and jump
 // into either drill with it.
-import { replay, acceptedNames, LEVELS, categoryOf, inCategory } from '../openings.js';
+import { replay, displayAliases, searchText, localFamily, LEVELS, categoryOf, inCategory } from '../openings.js';
 import { normalize } from '../grading.js';
 import { settings, setSetting, stats, mastery } from '../store.js';
-import { h, icon, button, nameEl, renderMoves, navBar, showPly, setPlayers } from '../ui.js';
+import { t, num } from '../i18n.js';
+import { h, icon, button, nameEl, localNameEl, lineEl, renderMoves, navBar, showPly, setPlayers } from '../ui.js';
 
 const FILTERS = [
-  ['all', 'All', () => true],
-  ['todo', 'To learn', (o) => mastery(o.name) < 2],
-  ['learned', 'Learned', (o) => mastery(o.name) === 2],
+  ['all', 'lib.all', () => true],
+  ['todo', 'lib.todo', (o) => mastery(o.name) < 2],
+  ['learned', 'lib.learned', (o) => mastery(o.name) === 2],
 ];
 const PAGE = 200;
-const fmt = (n) => n.toLocaleString('en-US');
 
 export class LibraryView {
   constructor(ctx) {
@@ -39,12 +39,19 @@ export class LibraryView {
     this.orientation = this.ctx.board.orientation;
   }
 
+  /** Redraws the panel, e.g. after the interface language changed. */
+  refresh() {
+    if (this.opening) this.renderDetail();
+    else this.renderList();
+    this.updatePlayers(this.ctx.board.fen);
+  }
+
   // ---- list --------------------------------------------------------------------------
 
   filtered() {
     const test = FILTERS.find(([id]) => id === this.filter)[2];
     const words = normalize(this.query).split(' ').filter(Boolean);
-    const hay = (o) => o._hay || (o._hay = normalize([o.title, o.name, ...(o.aka || []), o.eco, o.moves].join(' ')));
+    const hay = (o) => o._hay || (o._hay = normalize(searchText(o)));
     const list = inCategory(this.category).filter((o) => test(o) && words.every((w) => hay(o).includes(w)));
     // The curated categories read best alphabetically; Expert keeps ECO order.
     return this.category === 'expert' ? list : [...list].sort((a, b) => a.title.localeCompare(b.title));
@@ -66,11 +73,11 @@ export class LibraryView {
         type: 'button', role: 'tab',
         class: 'cat-card' + (id === this.category ? ' active' : '') + (done ? ' done' : ''),
         style: `--cat:${l.color}`,
-        title: `${fmt(learned)} of ${fmt(list.length)} ${l.label} openings learned`,
+        title: t('lib.cardTitle', { level: t(`level.${id}`), learned, total: list.length }),
         onclick: () => this.setCategory(id),
       },
-      h('span', { class: 'cat-name' }, l.label, done ? h('span', { class: 'cat-trophy', html: icon('trophy') }) : null),
-      h('span', { class: 'cat-count' }, h('b', {}, fmt(learned)), ` / ${fmt(list.length)}`),
+      h('span', { class: 'cat-name' }, t(`level.${id}`), done ? h('span', { class: 'cat-trophy', html: icon('trophy') }) : null),
+      h('span', { class: 'cat-count' }, h('b', {}, num(learned)), ` / ${num(list.length)}`),
       h('span', { class: 'cat-bar' }, h('span', { class: 'cat-fill', style: `width:${(learned / list.length) * 100}%` })));
     }));
   }
@@ -84,14 +91,14 @@ export class LibraryView {
       this.ctx.go(view);
     };
     return h('div', { class: 'cat-info', style: `--cat:${l.color}` },
-      h('div', { class: 'cat-goal' }, l.goal),
+      h('div', { class: 'cat-goal' }, t(`goal.${this.category}`)),
       h('div', { class: 'cat-actions' },
         h('span', { class: 'cat-left' + (left ? '' : ' done') },
-          left ? `${fmt(left)} left to learn` : `All ${fmt(list.length)} learned!`),
+          left ? t('lib.left', { n: left }) : t('lib.allLearned', { n: list.length })),
         h('span', { class: 'grow' }),
-        h('span', { class: 'cat-practise' }, 'Practise:'),
-        h('button', { type: 'button', class: 'link-btn', html: icon('name'), onclick: practise('name') }, 'Name It'),
-        h('button', { type: 'button', class: 'link-btn', html: icon('play'), onclick: practise('play') }, 'Play It')));
+        h('span', { class: 'cat-practise' }, t('lib.practise')),
+        h('button', { type: 'button', class: 'link-btn', html: icon('name'), onclick: practise('name') }, t('nav.name')),
+        h('button', { type: 'button', class: 'link-btn', html: icon('play'), onclick: practise('play') }, t('nav.play'))));
   }
 
   renderList() {
@@ -102,7 +109,7 @@ export class LibraryView {
     this.updatePlayers(board.fen);
 
     const search = h('input', {
-      class: 'search-input', type: 'search', placeholder: 'Search by name, ECO code or moves…',
+      class: 'search-input', type: 'search', placeholder: t('lib.search'),
       value: this.query, spellcheck: 'false',
       oninput: (e) => { this.query = e.target.value; this.limit = PAGE; this.fillList(); },
     });
@@ -110,12 +117,12 @@ export class LibraryView {
     const filters = h('div', { class: 'seg seg-small lib-filter' }, ...FILTERS.map(([id, label, test]) => h('button', {
       type: 'button', class: 'seg-opt' + (this.filter === id ? ' active' : ''),
       onclick: () => { this.filter = id; this.limit = PAGE; this.scroll = 0; this.renderList(); },
-    }, label, h('span', { class: 'seg-count' }, fmt(inCat.filter(test).length)))));
+    }, t(label), h('span', { class: 'seg-count' }, num(inCat.filter(test).length)))));
 
     this.$list = h('div', { class: 'op-list' });
     this.$summary = h('div', { class: 'lib-summary' });
     panel.replaceChildren(
-      this.ctx.panelHead('library', 'Opening Library'),
+      this.ctx.panelHead('library', t('lib.title')),
       h('div', { class: 'panel-body lib-body' },
         this.categoryCards(),
         this.categoryInfo(),
@@ -129,30 +136,29 @@ export class LibraryView {
 
   fillList() {
     const list = this.filtered();
-    this.$summary.textContent = this.query ? `${fmt(list.length)} ${list.length === 1 ? 'match' : 'matches'}` : '';
+    this.$summary.textContent = this.query ? t('lib.matches', { n: list.length }) : '';
     this.$summary.hidden = !this.query;
     this.$list.replaceChildren(...list.slice(0, this.limit).map((o) => this.rowEl(o)));
     if (!list.length) {
-      const msg = this.query ? 'No openings match your search.'
-        : this.filter === 'learned' ? 'Nothing learned here yet. Name an opening and play its moves to learn it.'
-          : 'You have learned every opening in this category!';
-      this.$list.append(h('div', { class: 'moves-empty' }, msg));
+      const msg = this.query ? 'lib.noMatch' : this.filter === 'learned' ? 'lib.noneLearned' : 'lib.allDone';
+      this.$list.append(h('div', { class: 'moves-empty' }, t(msg)));
     }
     if (list.length > this.limit) {
       this.$list.append(h('button', {
         type: 'button', class: 'more-btn',
         onclick: () => { this.limit += PAGE; this.scroll = this.$list.scrollTop; this.fillList(); this.$list.scrollTop = this.scroll; },
-      }, `Show more (${fmt(list.length - this.limit)} left)`));
+      }, t('lib.showMore', { n: list.length - this.limit })));
     }
   }
 
   rowEl(o) {
     const m = mastery(o.name);
-    const preview = o.plies.slice(0, 8).map((san, i) => (i % 2 === 0 ? `${i / 2 + 1}.${san}` : san)).join(' ') + (o.plies.length > 8 ? ' …' : '');
+    const fam = localFamily(o);
     return h('button', { type: 'button', class: 'op-row', onclick: () => { this.scroll = this.$list.scrollTop; this.open(o); } },
       h('span', { class: 'eco' }, o.eco),
-      h('span', { class: 'op-row-main' }, nameEl(o), h('span', { class: 'op-row-moves' }, preview)),
-      h('span', { class: `mastery m${m}`, title: ['New', 'Practised', 'Learned'][m], html: m === 2 ? icon('check') : '' }));
+      h('span', { class: 'op-row-main' }, nameEl(o),
+        h('span', { class: 'op-row-moves' }, fam ? h('span', { class: 'op-row-local' }, `${fam} · `) : null, lineEl(o.plies))),
+      h('span', { class: `mastery m${m}`, title: t(`lib.status.${m}`), html: m === 2 ? icon('check') : '' }));
   }
 
   // ---- one opening ------------------------------------------------------------------
@@ -175,25 +181,26 @@ export class LibraryView {
     const st = stats(o.name) || {};
     const chip = (label, s) => h('span', { class: 'chip' + (s?.streak > 0 ? ' ok' : s?.seen ? ' tried' : ''), html: s?.streak > 0 ? icon('check') : '' },
       `${label}${s?.seen ? ` ${s.good}/${s.seen}` : ''}`);
-    const others = acceptedNames(o).filter((n) => n !== o.title && n !== o.name);
+    const others = displayAliases(o);
     this.$moves = h('div', { class: 'moves' });
     this.ctx.panel.replaceChildren(
-      this.ctx.panelHead('library', 'Opening Library'),
+      this.ctx.panelHead('library', t('lib.title')),
       h('div', { class: 'panel-body' },
-        h('button', { type: 'button', class: 'link-btn back-btn', html: icon('back'), onclick: () => this.renderList() }, 'All openings'),
+        h('button', { type: 'button', class: 'link-btn back-btn', html: icon('back'), onclick: () => this.renderList() }, t('lib.back')),
         h('div', { class: 'detail-head' },
           h('div', { class: 'detail-name' }, nameEl(o)),
-          h('div', { class: 'result-meta' }, `ECO ${o.eco} · ${o.plies.length} half-moves · `,
-            h('span', { class: 'level-tag', style: `--cat:${LEVELS[categoryOf(o)].color}` }, LEVELS[categoryOf(o)].label)),
-          o.display && o.display !== o.name ? h('div', { class: 'result-meta' }, `Listed as ${o.name}`) : null,
-          others.length ? h('div', { class: 'result-meta' }, `Also known as ${others.slice(0, 3).join(' · ')}`) : null,
-          h('div', { class: 'chips' }, chip('Named', st.name), chip('Played', st.play))),
-        h('div', { class: 'moves-card' }, h('div', { class: 'moves-head' }, h('span', {}, 'Moves'),
-          h('button', { class: 'link-btn', type: 'button', onclick: () => this.replayLine() }, 'Replay')), this.$moves),
+          localNameEl(o),
+          h('div', { class: 'result-meta' }, `ECO ${o.eco} · ${t('common.halfMoves', { n: o.plies.length })} · `,
+            h('span', { class: 'level-tag', style: `--cat:${LEVELS[categoryOf(o)].color}` }, t(`level.${categoryOf(o)}`))),
+          o.display && o.display !== o.name ? h('div', { class: 'result-meta' }, t('name.listedAs', { name: o.name })) : null,
+          others.length ? h('div', { class: 'result-meta' }, t('lib.knownAs', { names: others.slice(0, 3).join(' · ') })) : null,
+          h('div', { class: 'chips' }, chip(t('lib.named'), st.name), chip(t('lib.played'), st.play))),
+        h('div', { class: 'moves-card' }, h('div', { class: 'moves-head' }, h('span', {}, t('common.moves')),
+          h('button', { class: 'link-btn', type: 'button', onclick: () => this.replayLine() }, t('common.replay'))), this.$moves),
         h('div', { class: 'btn-row' },
-          button('Name it', { iconName: 'name', onclick: () => this.ctx.go('name', o) }),
+          button(t('common.nameIt'), { iconName: 'name', onclick: () => this.ctx.go('name', o) }),
           h('div', { class: 'grow' }),
-          button('Play it', { kind: 'primary', iconName: 'play', onclick: () => this.ctx.go('play', o) }))),
+          button(t('common.playIt'), { kind: 'primary', iconName: 'play', onclick: () => this.ctx.go('play', o) }))),
       navBar({
         first: () => this.nav(0), prev: () => this.nav(this.ply - 1),
         next: () => this.nav(this.ply + 1), last: () => this.nav(this.line.moves.length),
@@ -233,8 +240,8 @@ export class LibraryView {
   }
 
   updatePlayers(fen) {
-    const white = { name: 'White', avatar: 'av-white', color: 'w' };
-    const black = { name: 'Black', avatar: 'av-black', color: 'b' };
+    const white = { name: t('color.white'), avatar: 'av-white', color: 'w' };
+    const black = { name: t('color.black'), avatar: 'av-black', color: 'b' };
     const flipped = this.ctx.board.orientation === 'black';
     setPlayers(this.ctx.bars, { fen, top: flipped ? white : black, bottom: flipped ? black : white });
   }

@@ -1,10 +1,11 @@
 // "Name It": a position from an opening is played out on the board and the
 // player types the opening's name.
 import { gradeAnswer, requiredPart, letterHint, splitName } from '../grading.js';
-import { LEVELS, pickNext, replay, acceptedNames, askText, categoryOf } from '../openings.js';
+import { LEVELS, pickNext, replay, acceptedNames, askText, categoryOf, localFamily, localTitle, displayAliases } from '../openings.js';
 import { settings, setSetting, stats, record, getRecord, setRecord } from '../store.js';
 import { play } from '../sound.js';
-import { h, icon, button, nameEl, renderMoves, navBar, showPly, setPlayers } from '../ui.js';
+import { t, num } from '../i18n.js';
+import { h, icon, button, nameEl, localNameEl, renderMoves, navBar, showPly, setPlayers, statEl } from '../ui.js';
 
 export class NameView {
   constructor(ctx) {
@@ -32,6 +33,12 @@ export class NameView {
   leave() {
     this.stopAutoplay();
     this.orientation = this.ctx.board.orientation;
+  }
+
+  /** Redraws the panel, e.g. after the interface language changed. */
+  refresh() {
+    this.render();
+    this.updatePlayers();
   }
 
   get depth() {
@@ -111,17 +118,14 @@ export class NameView {
     }
     if (g.result === 'partial') {
       play('partial');
-      const family = splitName(this.opening.title)[0];
+      const family = localFamily(this.opening) || splitName(this.opening.title)[0];
       const familyRight = g.hits[0] && !g.extras.length;
-      this.feedback = {
-        kind: 'partial',
-        text: familyRight && this.depth > 1
-          ? `Close! “${family}” is right. Which variation is it?`
-          : 'Close, but not quite. Check the details and try again.',
-      };
+      this.feedback = familyRight && this.depth > 1
+        ? { kind: 'partial', key: 'name.familyRight', vars: { family } }
+        : { kind: 'partial', key: 'name.close' };
     } else {
       play('wrong');
-      this.feedback = { kind: 'wrong', text: this.attempts > 1 ? 'Still not it. Try a hint?' : 'Not this one. Try again!' };
+      this.feedback = { kind: 'wrong', key: this.attempts > 1 ? 'name.wrongAgain' : 'name.wrong' };
       this.$input.classList.remove('shake');
       void this.$input.offsetWidth;
       this.$input.classList.add('shake');
@@ -162,18 +166,19 @@ export class NameView {
   }
 
   hintText() {
-    const target = requiredPart(this.opening.title, this.depth);
+    // The family is masked in the interface language when it has a translation.
+    const target = requiredPart(localTitle(this.opening), this.depth);
     if (this.hintLevel === 1) return `ECO ${this.opening.eco} · ${letterHint(target)}`;
     const parts = splitName(target);
     if (parts.length > 1) return `${parts[0]}: ${letterHint(parts.slice(1).join(', '))}`;
-    return target.replace(/[A-Za-zÀ-ÿ]+/g, (w) => (w.length <= 3 ? w : w.slice(0, 3) + '_'.repeat(w.length - 3)));
+    return target.replace(/\p{L}+/gu, (w) => (w.length <= 3 ? w : w.slice(0, 3) + '_'.repeat(w.length - 3)));
   }
 
   // ---- rendering ----------------------------------------------------------------
 
   updatePlayers() {
-    const white = { name: 'White', avatar: 'av-white', color: 'w' };
-    const black = { name: 'Black', avatar: 'av-black', color: 'b' };
+    const white = { name: t('color.white'), avatar: 'av-white', color: 'w' };
+    const black = { name: t('color.black'), avatar: 'av-black', color: 'b' };
     const flipped = this.ctx.board.orientation === 'black';
     setPlayers(this.ctx.bars, { fen: this.line.fens[this.ply], top: flipped ? white : black, bottom: flipped ? black : white });
   }
@@ -186,24 +191,24 @@ export class NameView {
 
     this.$moves = h('div', { class: 'moves' });
     const movesHead = h('div', { class: 'moves-head' },
-      h('span', {}, 'Moves'),
+      h('span', {}, t('common.moves')),
       h('button', {
         class: 'link-btn', type: 'button',
         onclick: () => { setSetting('nameShowMoves', !settings.nameShowMoves); this.render(); },
-      }, settings.nameShowMoves ? 'Hide moves' : 'Show moves'),
-      h('button', { class: 'link-btn', type: 'button', onclick: () => this.replayLine() }, 'Replay'));
+      }, t(settings.nameShowMoves ? 'name.hideMoves' : 'name.showMoves')),
+      h('button', { class: 'link-btn', type: 'button', onclick: () => this.replayLine() }, t('common.replay')));
 
     const body = h('div', { class: 'panel-body' },
       this.ctx.levelPicker(() => this.ask()),
       h('div', { class: 'stat-strip' },
-        h('div', { class: 'stat' + (s.streak ? ' hot' : ''), html: `${icon('flame')}<b>${s.streak}</b><span>Streak</span>` }),
-        h('div', { class: 'stat', html: `${icon('check')}<b>${s.correct}/${s.total}</b><span>This session</span>` }),
-        h('div', { class: 'stat', html: `${icon('trophy')}<b>${best}</b><span>Best streak</span>` })),
+        statEl('flame', num(s.streak), t('stats.streak'), s.streak > 0),
+        statEl('check', `${num(s.correct)}/${num(s.total)}`, t('stats.session')),
+        statEl('trophy', num(best), t('stats.best'))),
       h('div', { class: 'moves-card' }, movesHead, this.$moves),
       this.phase === 'asking' ? this.questionEl() : this.resultEl());
 
     panel.replaceChildren(
-      this.ctx.panelHead('name', 'Name the Opening'),
+      this.ctx.panelHead('name', t('name.title')),
       body,
       navBar({
         first: () => this.nav(0), prev: () => this.nav(this.ply - 1),
@@ -216,7 +221,7 @@ export class NameView {
 
   questionEl() {
     this.$input = h('input', {
-      class: 'answer-input', type: 'text', placeholder: 'Type the opening name…', spellcheck: 'false', autocomplete: 'off',
+      class: 'answer-input', type: 'text', placeholder: t('name.placeholder'), spellcheck: 'false', autocomplete: 'off',
       value: this.answer,
       onkeydown: (e) => {
         // Stop here so the document-level Enter ("next question") doesn't also fire.
@@ -225,22 +230,23 @@ export class NameView {
     });
     this.$feedback = h('div', { class: 'feedback' });
     return h('div', { class: 'question' },
-      h('div', { class: 'q-title' }, 'Which opening is this?'),
+      h('div', { class: 'q-title' }, t('name.question')),
       h('div', { class: 'q-sub' }, askText(this.depth)),
       this.$input,
       this.$feedback,
       h('div', { class: 'btn-row' },
-        button('Hint', { iconName: 'hint', onclick: () => this.hint() }),
-        button('Show answer', { iconName: 'eye', onclick: () => this.giveUp() }),
+        button(t('common.hint'), { iconName: 'hint', onclick: () => this.hint() }),
+        button(t('name.showAnswer'), { iconName: 'eye', onclick: () => this.giveUp() }),
         h('div', { class: 'grow' }),
-        button('Submit', { kind: 'primary', onclick: () => this.submit() })));
+        button(t('name.submit'), { kind: 'primary', onclick: () => this.submit() })));
   }
 
   renderFeedback() {
     if (!this.$feedback) return;
     this.$feedback.replaceChildren();
     if (this.feedback) {
-      this.$feedback.append(h('div', { class: `fb fb-${this.feedback.kind}`, html: icon(this.feedback.kind === 'partial' ? 'half' : 'cross') }, this.feedback.text));
+      const { kind, key, vars } = this.feedback;
+      this.$feedback.append(h('div', { class: `fb fb-${kind}`, html: icon(kind === 'partial' ? 'half' : 'cross') }, t(key, vars)));
     }
     if (this.hintLevel) {
       this.$feedback.append(h('div', { class: 'fb fb-hint', html: icon('hint') }, h('span', { class: 'mono' }, this.hintText())));
@@ -251,21 +257,22 @@ export class NameView {
     const o = this.opening;
     const { correct, firstTry } = this.result;
     const kind = correct ? 'correct' : 'wrong';
-    const title = correct ? (firstTry ? 'Correct!' : 'Got it!') : 'The answer was';
-    const others = acceptedNames(o).filter((n) => n !== o.title && n !== o.name);
+    const title = t(correct ? (firstTry ? 'name.correct' : 'name.gotIt') : 'name.answerWas');
+    const others = displayAliases(o);
     return h('div', { class: `result result-${kind}` },
       h('div', { class: 'result-head' },
         h('span', { class: 'result-icon', html: icon(correct ? 'check' : 'cross') }),
         h('span', { class: 'result-title' }, title),
-        this.answer && !correct ? h('span', { class: 'result-yours' }, `You said “${this.answer}”`) : null),
+        this.answer && !correct ? h('span', { class: 'result-yours' }, t('name.youSaid', { answer: this.answer })) : null),
       h('div', { class: 'result-name' }, nameEl(o)),
-      o.display && o.display !== o.name ? h('div', { class: 'result-meta' }, `Listed as ${o.name}`) : null,
-      others.length ? h('div', { class: 'result-meta' }, `Also accepted: ${others.slice(0, 3).join(' · ')}`) : null,
-      h('div', { class: 'result-meta' }, `ECO ${o.eco} · ${o.plies.length} ${o.plies.length === 1 ? 'move' : 'half-moves'}`),
+      localNameEl(o),
+      o.display && o.display !== o.name ? h('div', { class: 'result-meta' }, t('name.listedAs', { name: o.name })) : null,
+      others.length ? h('div', { class: 'result-meta' }, t('name.alsoAccepted', { names: others.slice(0, 3).join(' · ') })) : null,
+      h('div', { class: 'result-meta' }, `ECO ${o.eco} · ${t('common.halfMoves', { n: o.plies.length })}`),
       h('div', { class: 'btn-row' },
-        button('Practice moves', { iconName: 'play', onclick: () => this.ctx.go('play', o) }),
+        button(t('name.practice'), { iconName: 'play', onclick: () => this.ctx.go('play', o) }),
         h('div', { class: 'grow' }),
-        button('Next', { kind: 'primary', iconName: 'arrowRight', onclick: () => this.ask(), cls: 'icon-right' })));
+        button(t('common.next'), { kind: 'primary', iconName: 'arrowRight', onclick: () => this.ask(), cls: 'icon-right' })));
   }
 
   renderMoveList() {
@@ -275,7 +282,7 @@ export class NameView {
       current: this.ply,
       onPick: (n) => this.nav(n),
       hidden: !settings.nameShowMoves && this.phase === 'asking',
-      placeholder: 'Watch the moves…',
+      placeholder: t('name.watch'),
     });
   }
 

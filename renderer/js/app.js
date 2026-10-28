@@ -1,32 +1,36 @@
 // App shell: sidebar navigation, shared board, settings dialog and keyboard shortcuts.
 import { Board } from './board.js';
 import { loadOpenings, LEVELS } from './openings.js';
+import { loadPuzzles } from './puzzles.js';
 import { settings, setSetting, resetProgress } from './store.js';
-import { h, icon } from './ui.js';
+import { LANGUAGES, pickLanguage, setLanguage, t } from './i18n.js';
+import { h, icon, fitButtonRows } from './ui.js';
 import { NameView } from './modes/name.js';
 import { PlayView } from './modes/play.js';
+import { MateView } from './modes/mate.js';
 import { LibraryView } from './modes/library.js';
 
 // Every set here may be freely redistributed; see THIRD_PARTY_NOTICES.md.
 const PIECE_SETS = [
-  ['cburnett', 'Classic'], ['mpchess', 'Bold'], ['merida', 'Merida'], ['chessnut', 'Chessnut'],
-  ['celtic', 'Celtic'], ['fantasy', 'Fantasy'], ['rhosgfx', 'Wood'],
+  ['cburnett', 'pieces.classic'], ['mpchess', 'pieces.bold'], ['merida', 'pieces.merida'], ['chessnut', 'pieces.chessnut'],
+  ['celtic', 'pieces.celtic'], ['fantasy', 'pieces.fantasy'], ['rhosgfx', 'pieces.wood'],
 ];
 const THEMES = [
-  ['green', 'Green', '#ebecd0', '#739552'], ['brown', 'Brown', '#f0d9b5', '#b58863'],
-  ['blue', 'Blue', '#dee3e6', '#8ca2ad'], ['purple', 'Purple', '#efeff5', '#8877b7'],
-  ['gray', 'Gray', '#d9d9d9', '#8c8c8c'],
+  ['green', 'theme.green', '#ebecd0', '#739552'], ['brown', 'theme.brown', '#f0d9b5', '#b58863'],
+  ['blue', 'theme.blue', '#dee3e6', '#8ca2ad'], ['purple', 'theme.purple', '#efeff5', '#8877b7'],
+  ['gray', 'theme.gray', '#d9d9d9', '#8c8c8c'],
 ];
-const SPEEDS = [[0, 'Off'], [120, 'Fast'], [200, 'Normal'], [320, 'Slow']];
+const SPEEDS = [[0, 'set.speed.off'], [120, 'set.speed.fast'], [200, 'set.speed.normal'], [320, 'set.speed.slow']];
 
+// Sidebar order; the number keys 1–4 follow it.
 const VIEWS = [
-  ['name', 'Name It', 'name'],
-  ['play', 'Play It', 'play'],
-  ['library', 'Library', 'library'],
+  ['name', 'nav.name', 'name'],
+  ['play', 'nav.play', 'play'],
+  ['mate', 'nav.mate', 'mate'],
+  ['library', 'nav.library', 'library'],
 ];
 
 let current = null;
-let currentId = null;
 let views = {};
 let board;
 
@@ -39,24 +43,35 @@ const ctx = {
     return h('div', { class: 'panel-head', html: icon(iconName) }, h('span', {}, title));
   },
   levelPicker(onChange) {
-    return h('div', { class: 'seg', role: 'tablist', title: 'Difficulty' },
+    return h('div', { class: 'seg', role: 'tablist', title: t('level.difficulty') },
       ...Object.entries(LEVELS).map(([id, l]) => h('button', {
         type: 'button', class: 'seg-opt' + (settings.level === id ? ' active' : ''),
         onclick: () => { if (settings.level !== id) { setSetting('level', id); onChange(); } },
-      }, h('span', { class: 'lvl-dot', style: `background:${l.color}` }), l.label)));
+      }, h('span', { class: 'lvl-dot', style: `background:${l.color}` }), t(`level.${id}`))));
   },
 };
 
 function go(id, arg) {
   current?.leave();
-  currentId = id;
   current = views[id];
   for (const b of document.querySelectorAll('.nav-item[data-view]')) b.classList.toggle('active', b.dataset.view === id);
   setSetting('lastView', id);
   current.enter(arg);
 }
 
-// ---- appearance ----------------------------------------------------------------------
+// ---- sidebar & appearance -------------------------------------------------------------------
+
+function renderNav() {
+  const nav = document.getElementById('nav');
+  nav.replaceChildren(...VIEWS.map(([id, label, iconName]) => h('button', {
+    type: 'button', class: 'nav-item' + (current === views[id] ? ' active' : ''), 'data-view': id,
+    html: icon(iconName), onclick: () => go(id), title: t(label),
+  }, h('span', {}, t(label)))));
+  const settingsBtn = document.getElementById('btn-settings');
+  settingsBtn.innerHTML = icon('settings') + `<span>${t('nav.settings')}</span>`;
+  settingsBtn.title = t('nav.settings');
+  document.querySelector('#settings .dlg-close').title = t('set.close');
+}
 
 function applyAppearance() {
   const root = document.getElementById('board');
@@ -67,28 +82,45 @@ function applyAppearance() {
   board.showDests = settings.showDests;
   board.renderOverlays();
   const btn = document.getElementById('btn-sound');
-  btn.innerHTML = icon(settings.sound ? 'soundOn' : 'soundOff') + `<span>${settings.sound ? 'Sound on' : 'Sound off'}</span>`;
+  const label = t(settings.sound ? 'nav.soundOn' : 'nav.soundOff');
+  btn.innerHTML = icon(settings.sound ? 'soundOn' : 'soundOff') + `<span>${label}</span>`;
+  btn.title = label;
+}
+
+function changeLanguage(code) {
+  setSetting('lang', code);
+  setLanguage(code);
+  renderNav();
+  applyAppearance();
+  current?.refresh?.();
 }
 
 // ---- settings dialog ---------------------------------------------------------------------
 
 function openSettings() {
   const dlg = document.getElementById('settings');
+  dlg.querySelector('.dlg-head > span').textContent = t('set.title');
   const body = dlg.querySelector('.dlg-body');
 
+  const langRow = h('div', { class: 'seg seg-small lang-seg' }, ...LANGUAGES.map(([code, label]) => h('button', {
+    type: 'button', class: 'seg-opt' + (settings.lang === code || (!settings.lang && document.documentElement.lang === code) ? ' active' : ''),
+    lang: code,
+    onclick: () => { changeLanguage(code); openSettings(); },
+  }, label)));
+
   const pieceRow = h('div', { class: 'piece-sets' }, ...PIECE_SETS.map(([id, label]) => h('button', {
-    type: 'button', class: 'piece-set' + (settings.pieceSet === id ? ' active' : ''), title: label,
-    onclick: () => { setSetting('pieceSet', id); applyAppearance(); openSettings(); },
-  }, h('span', { class: 'ps-img', style: `background-image:url(pieces/${id}/wN.svg)` }), h('span', {}, label))));
+    type: 'button', class: 'piece-set' + (settings.pieceSet === id ? ' active' : ''), title: t(label), 'data-set': id,
+    onclick: () => { setSetting('pieceSet', id); applyAppearance(); current?.refresh?.(); openSettings(); },
+  }, h('span', { class: 'ps-img', style: `background-image:url(pieces/${id}/wN.svg)` }), h('span', {}, t(label)))));
 
   const themeRow = h('div', { class: 'themes' }, ...THEMES.map(([id, label, light, dark]) => h('button', {
-    type: 'button', class: 'theme' + (settings.boardTheme === id ? ' active' : ''), title: label,
+    type: 'button', class: 'theme' + (settings.boardTheme === id ? ' active' : ''), title: t(label), 'data-theme': id,
     style: `background: linear-gradient(135deg, ${light} 0 50%, ${dark} 50% 100%)`,
     onclick: () => { setSetting('boardTheme', id); applyAppearance(); openSettings(); },
   })));
 
   const toggle = (key, label, hint) => h('label', { class: 'toggle-row' },
-    h('span', {}, h('span', { class: 'toggle-label' }, label), hint ? h('span', { class: 'toggle-hint' }, hint) : null),
+    h('span', {}, h('span', { class: 'toggle-label' }, t(label)), hint ? h('span', { class: 'toggle-hint' }, t(hint)) : null),
     h('input', {
       type: 'checkbox', class: 'switch', checked: settings[key],
       onchange: (e) => { setSetting(key, e.target.checked); applyAppearance(); },
@@ -97,29 +129,36 @@ function openSettings() {
   const speed = h('div', { class: 'seg seg-small' }, ...SPEEDS.map(([ms, label]) => h('button', {
     type: 'button', class: 'seg-opt' + (settings.animMs === ms ? ' active' : ''),
     onclick: () => { setSetting('animMs', ms); applyAppearance(); openSettings(); },
-  }, label)));
+  }, t(label))));
 
   body.replaceChildren(
-    h('div', { class: 'dlg-section' }, h('div', { class: 'dlg-label' }, 'Pieces'), pieceRow),
-    h('div', { class: 'dlg-section' }, h('div', { class: 'dlg-label' }, 'Board'), themeRow),
+    h('div', { class: 'dlg-section' }, h('div', { class: 'dlg-label' }, t('set.language')), langRow),
+    h('div', { class: 'dlg-section' }, h('div', { class: 'dlg-label' }, t('set.pieces')), pieceRow),
+    h('div', { class: 'dlg-section' }, h('div', { class: 'dlg-label' }, t('set.board')), themeRow),
     h('div', { class: 'dlg-section' },
-      h('div', { class: 'toggle-row' }, h('span', { class: 'toggle-label' }, 'Piece animation'), speed),
-      toggle('sound', 'Sound effects'),
-      toggle('showDests', 'Show legal moves', 'Dots on the squares a selected piece can go to'),
-      toggle('coords', 'Show coordinates'),
-      toggle('nameAnimate', 'Play the moves out in Name It', 'Otherwise the final position appears at once')),
+      h('div', { class: 'toggle-row' }, h('span', { class: 'toggle-label' }, t('set.anim')), speed),
+      toggle('sound', 'set.sound'),
+      toggle('showDests', 'set.dests', 'set.destsHint'),
+      toggle('coords', 'set.coords'),
+      toggle('nameAnimate', 'set.nameAnimate', 'set.nameAnimateHint')),
     h('div', { class: 'dlg-section' },
       h('div', { class: 'toggle-row' },
-        h('span', {}, h('span', { class: 'toggle-label' }, 'Learning progress'), h('span', { class: 'toggle-hint' }, 'Clears which openings you have named and played')),
+        h('span', {}, h('span', { class: 'toggle-label' }, t('set.progress')), h('span', { class: 'toggle-hint' }, t('set.progressHint'))),
         h('button', {
           type: 'button', class: 'btn btn-danger',
           onclick: (e) => {
             const b = e.currentTarget;
-            if (b.dataset.armed) { resetProgress(); b.textContent = 'Cleared'; b.disabled = true; return; }
+            if (b.dataset.armed) {
+              resetProgress();
+              b.textContent = t('set.cleared');
+              b.disabled = true;
+              current?.refresh?.();
+              return;
+            }
             b.dataset.armed = '1';
-            b.textContent = 'Click again to confirm';
+            b.textContent = t('set.confirm');
           },
-        }, 'Reset progress'))));
+        }, t('set.reset')))));
   if (!dlg.open) dlg.showModal();
 }
 
@@ -133,7 +172,7 @@ function onKey(e) {
     current?.updatePlayers?.(board.fen);
     return;
   }
-  if (!typing && !e.ctrlKey && !e.altKey && ['1', '2', '3'].includes(e.key)) {
+  if (!typing && !e.ctrlKey && !e.altKey && /^[1-4]$/.test(e.key)) {
     go(VIEWS[Number(e.key) - 1][0]);
     return;
   }
@@ -143,11 +182,8 @@ function onKey(e) {
 // ---- start ---------------------------------------------------------------------------
 
 async function main() {
-  const nav = document.getElementById('nav');
-  for (const [id, label, iconName] of VIEWS) {
-    nav.append(h('button', { type: 'button', class: 'nav-item', 'data-view': id, html: icon(iconName), onclick: () => go(id) }, h('span', {}, label)));
-  }
-  document.getElementById('btn-settings').innerHTML = icon('settings') + '<span>Settings</span>';
+  setLanguage(pickLanguage(settings.lang, navigator.language));
+  renderNav();
   document.getElementById('btn-settings').onclick = openSettings;
   document.getElementById('btn-sound').onclick = () => { setSetting('sound', !settings.sound); applyAppearance(); };
   document.getElementById('settings').addEventListener('click', (e) => {
@@ -159,13 +195,17 @@ async function main() {
   if (!PIECE_SETS.some(([id]) => id === settings.pieceSet)) setSetting('pieceSet', 'cburnett');
   applyAppearance();
   await loadOpenings();
-  views = { name: new NameView(ctx), play: new PlayView(ctx), library: new LibraryView(ctx) };
+  await loadPuzzles();
+  views = { name: new NameView(ctx), play: new PlayView(ctx), mate: new MateView(ctx), library: new LibraryView(ctx) };
   document.addEventListener('keydown', onKey);
+  // Re-fit button rows whenever a screen redraws its panel or the window is resized.
+  new MutationObserver(() => fitButtonRows(ctx.panel)).observe(ctx.panel, { childList: true, subtree: true });
+  window.addEventListener('resize', () => fitButtonRows(ctx.panel));
   document.body.classList.remove('loading');
   go(views[settings.lastView] ? settings.lastView : 'name');
 }
 
 main().catch((err) => {
   console.error(err);
-  document.getElementById('panel').textContent = `Something went wrong while starting: ${err.message}`;
+  document.getElementById('panel').textContent = t('app.startError', { error: err.message });
 });

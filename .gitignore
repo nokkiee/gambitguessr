@@ -3,3 +3,6 @@ dist/
 build/wine/
 *.log
 .DS_Store
+
+# Lichess puzzle dump extract (large; rebuilt by scripts/build-puzzles.js)
+data/raw/lichess_mate1.csv

@@ -3,6 +3,8 @@
 import { parseFen } from './board.js';
 import { settings } from './store.js';
 import { playMove } from './sound.js';
+import { t } from './i18n.js';
+import { localFamily } from './openings.js';
 
 export function h(tag, attrs = {}, ...children) {
   const el = document.createElement(tag);
@@ -43,6 +45,8 @@ const ICONS = {
   cross: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>',
   half: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
   trophy: '<path d="M7 4h10v5a5 5 0 0 1-10 0zM12 14v3.5M8.5 20h7M7 6H4.5c0 2.5 1.2 4 3 4.2M17 6h2.5c0 2.5-1.2 4-3 4.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  mate: '<path d="M12 2.6v3.6M10.2 4.3h3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6.5 20.5h11l-.9-4.4c2-1.2 3.3-3.2 3.3-5.4 0-2-1.6-3.4-3.5-3.4-1.7 0-3 1-4.4 2.8-1.4-1.8-2.7-2.8-4.4-2.8C5.7 7.3 4.1 8.7 4.1 10.7c0 2.2 1.3 4.2 3.3 5.4z" fill="currentColor"/><path d="M9.4 12.4l5.2 5.2M14.6 12.4l-5.2 5.2" stroke="#262522" stroke-width="1.8" stroke-linecap="round"/>',
+  external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
   book: '<path d="M3.5 6c2.8-1.3 5.6-1.3 8.5.6 2.9-1.9 5.7-1.9 8.5-.6v12.5c-2.8-1.3-5.6-1.3-8.5.6-2.9-1.9-5.7-1.9-8.5-.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 6.6v12.5" stroke="currentColor" stroke-width="2"/>',
 };
 
@@ -72,6 +76,48 @@ export function nameEl(o, cls = '') {
     rest.length ? h('span', { class: 'op-variation' }, `: ${rest.join(', ')}`) : null);
 }
 
+/** A small stat tile: icon, big value, label underneath. */
+export function statEl(iconName, value, label, hot = false) {
+  return h('div', { class: 'stat' + (hot ? ' hot' : ''), html: icon(iconName) }, h('b', {}, value), h('span', {}, label));
+}
+
+/** The opening's family in the interface language ("Obrona sycylijska"), if translated. */
+export function localNameEl(o, cls = '') {
+  const fam = localFamily(o);
+  return fam ? h('div', { class: `op-local ${cls}` }, fam) : null;
+}
+
+// ---- moves in figurine notation ("♘f3" with a piece picture), readable in any language ----
+
+const FIGURINE = /^([KQRBN])|=([QRBN])/g;
+
+/** A SAN move ("Nf3", "exd8=Q+") with the piece letters drawn as small pieces. */
+export function sanEl(san) {
+  const el = h('span', { class: 'san', 'data-san': san, title: san });
+  let last = 0;
+  for (const m of san.matchAll(FIGURINE)) {
+    const piece = m[1] || m[2];
+    const at = m.index + (m[2] ? 1 : 0);
+    if (at > last) el.append(san.slice(last, at));
+    el.append(h('span', { class: 'fig', style: `background-image:url(pieces/${settings.pieceSet}/w${piece}.svg)`, 'aria-label': piece }));
+    last = m.index + m[0].length;
+  }
+  if (last < san.length) el.append(san.slice(last));
+  return el;
+}
+
+/** "1.e4 c5 2.♘f3 …" for a list of SAN moves. */
+export function lineEl(sans, max = 8) {
+  const el = h('span', { class: 'line' });
+  sans.slice(0, max).forEach((san, i) => {
+    if (i) el.append(' ');
+    if (i % 2 === 0) el.append(`${i / 2 + 1}.`);
+    el.append(sanEl(san));
+  });
+  if (sans.length > max) el.append(' …');
+  return el;
+}
+
 // ---- move list -------------------------------------------------------------------
 
 /**
@@ -82,7 +128,7 @@ export function nameEl(o, cls = '') {
 export function renderMoves(box, { san, current, onPick, placeholder, hidden }) {
   box.replaceChildren();
   if (!san.length) {
-    box.append(h('div', { class: 'moves-empty' }, placeholder || 'No moves yet'));
+    box.append(h('div', { class: 'moves-empty' }, placeholder || t('common.noMoves')));
     return;
   }
   for (let i = 0; i < san.length; i += 2) {
@@ -95,7 +141,7 @@ export function renderMoves(box, { san, current, onPick, placeholder, hidden }) 
       const cell = h('span', {
         class: 'move' + (ply === current - 1 ? ' current' : '') + (onPick ? ' clickable' : ''),
         onclick: onPick ? () => onPick(ply + 1) : null,
-      }, hidden ? '•••' : san[ply]);
+      }, hidden ? '•••' : sanEl(san[ply]));
       row.append(cell);
     }
     box.append(row);
@@ -105,12 +151,25 @@ export function renderMoves(box, { san, current, onPick, placeholder, hidden }) 
   else box.scrollTop = box.scrollHeight;
 }
 
+/**
+ * Keeps a row of buttons on one line: if the labels don't fit (long words in some
+ * languages, narrow windows), the icons are dropped first and only then does it wrap.
+ */
+export function fitButtonRows(root = document) {
+  requestAnimationFrame(() => {
+    for (const row of root.querySelectorAll('.btn-row')) {
+      row.classList.remove('tight');
+      if (row.scrollWidth > row.clientWidth + 1) row.classList.add('tight');
+    }
+  });
+}
+
 export function navBar(handlers) {
   const bar = h('div', { class: 'nav-bar' });
-  for (const [key, title] of [['first', 'Start (↑)'], ['prev', 'Back (←)'], ['next', 'Forward (→)'], ['last', 'End (↓)']]) {
-    bar.append(button('', { iconName: key, onclick: handlers[key], title, kind: 'nav' }));
+  for (const [key, title] of [['first', 'navbar.start'], ['prev', 'navbar.back'], ['next', 'navbar.forward'], ['last', 'navbar.end']]) {
+    bar.append(button('', { iconName: key, onclick: handlers[key], title: t(title), kind: 'nav' }));
   }
-  bar.append(button('', { iconName: 'flip', onclick: handlers.flip, title: 'Flip board (F)', kind: 'nav' }));
+  bar.append(button('', { iconName: 'flip', onclick: handlers.flip, title: t('navbar.flip'), kind: 'nav' }));
   return bar;
 }
 
