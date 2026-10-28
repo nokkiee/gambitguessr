@@ -46,6 +46,11 @@ module.exports = async (H) => {
   await library(H, 'Beginner', '', 'mates');
   await H.shot('library-mates');
 
+  // Library: a puzzle's page, Légal's Mate move by move with the mate still hidden.
+  await H.click('.op-row', 'Légal’s Mate');
+  await H.sleep(600);
+  await H.shot('library-puzzle');
+
   // Name It: the Najdorf, named correctly.
   await library(H, 'Intermediate', 'Najdorf Variation');
   await H.click('.op-row');

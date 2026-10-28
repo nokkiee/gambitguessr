@@ -142,6 +142,8 @@ A puzzle counts as **solved** once you've found the mate on the first try withou
 - **Open a puzzle:** step through the moves that led to it, or reveal the mate. A revealed puzzle counts as tried, not solved.
 - **Solve it** opens that puzzle in Mate It.
 
+![A puzzle's page in the Library: Légal's Mate move by move, with the mate still hidden](docs/screenshots/library-puzzle.png)
+
 ### In your language
 
 ![Choosing the language](docs/screenshots/languages.png)
@@ -170,6 +172,7 @@ sidebar, or in Settings.
 |---|---|
 | `Enter` | submit the answer or go to the next opening |
 | `←` `→` `↑` `↓` | step through the moves |
+| `Esc` | back to the list (Library) |
 | `F` | flip the board |
 | `H` | hint (Play It, Mate It) |
 | `1` `2` `3` `4` | switch between Name It, Play It, Mate It and Library |
