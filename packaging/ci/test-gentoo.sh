@@ -24,7 +24,8 @@ cp -r packaging/gentoo/games-board /var/db/repos/local/
 ver=$(ls dist/gambitguessr-*.tar.gz | sed -E 's/.*gambitguessr-(.*)\.tar\.gz/\1/')
 cp dist/gambitguessr-"$ver".tar.gz /var/cache/distfiles/
 ebuild_file=/var/db/repos/local/games-board/gambitguessr-bin/gambitguessr-bin-"$ver".ebuild
-ebuild "$ebuild_file" manifest
+# The repo's Manifest is for the released tarball; this test uses the one just built.
+ebuild --force "$ebuild_file" manifest
 emerge --autounmask=y --autounmask-write=y --autounmask-continue=y games-board/gambitguessr-bin x11-misc/xvfb-run x11-apps/xauth
 set +x
 bash packaging/ci/smoke.sh "Gentoo ebuild (gambitguessr-bin)" gambitguessr
