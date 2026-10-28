@@ -14,6 +14,8 @@ CONF
 mkdir -p /etc/portage/package.accept_keywords /etc/portage/package.use /etc/portage/repos.conf /var/db/repos/local/{metadata,profiles}
 # xvfb-run needs the virtual X server, which Gentoo's binary X server isn't built with.
 echo 'x11-base/xorg-server xvfb' > /etc/portage/package.use/xvfb
+# In this container ordinary users can't use namespaces, so (like the ebuild advises) use USE=suid.
+echo 'games-board/gambitguessr-bin suid' > /etc/portage/package.use/gambitguessr
 echo 'games-board/gambitguessr-bin ~amd64' > /etc/portage/package.accept_keywords/gambitguessr
 echo local > /var/db/repos/local/profiles/repo_name
 printf 'masters = gentoo\nthin-manifests = true\n' > /var/db/repos/local/metadata/layout.conf

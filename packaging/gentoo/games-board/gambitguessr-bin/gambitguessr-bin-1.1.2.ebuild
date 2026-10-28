@@ -56,11 +56,9 @@ src_install() {
 
 pkg_postinst() {
 	xdg_pkg_postinst
-	if ! use suid; then
-		local clone=/proc/sys/kernel/unprivileged_userns_clone max=/proc/sys/user/max_user_namespaces
-		if [[ -r ${clone} && $(<"${clone}") == 0 ]] || [[ -r ${max} && $(<"${max}") == 0 ]]; then
-			ewarn "Unprivileged user namespaces are disabled on this system, so GambitGuessr's"
-			ewarn "sandbox can't start. Re-emerge with USE=suid to fix this."
-		fi
+	# Chromium's sandbox needs user, PID and network namespaces for ordinary users.
+	if ! use suid && ! runuser -u nobody -- unshare --user --map-root-user --pid --net --fork true &>/dev/null; then
+		ewarn "Ordinary users can't create the namespaces GambitGuessr's sandbox needs on this"
+		ewarn "system, so the app won't start. Re-emerge it with USE=suid."
 	fi
 }
