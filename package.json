@@ -1,7 +1,7 @@
 {
   "name": "gambitguessr",
   "productName": "GambitGuessr",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "GambitGuessr: learn chess openings by naming them, playing their moves and finding the mates they set up. In English, Polish, German, Spanish and French.",
   "main": "main.js",
   "license": "GPL-3.0-or-later",
@@ -53,7 +53,10 @@
     "linux": {
       "target": [
         "AppImage",
-        "deb"
+        "deb",
+        "rpm",
+        "pacman",
+        "tar.gz"
       ],
       "category": "Game",
       "icon": "build/icons",
@@ -67,7 +70,17 @@
       },
       "syncDesktopName": true,
       "maintainer": "nokkiee <202015925+nokkiee@users.noreply.github.com>",
-      "executableName": "gambitguessr"
+      "executableName": "gambitguessr",
+      "extraFiles": [
+        {
+          "from": "build/icons/512x512.png",
+          "to": "gambitguessr.png"
+        },
+        {
+          "from": "packaging/linux/gambitguessr.desktop",
+          "to": "gambitguessr.desktop"
+        }
+      ]
     },
     "deb": {
       "packageCategory": "games"
@@ -94,6 +107,45 @@
     },
     "portable": {
       "artifactName": "${productName}-${version}-Portable.${ext}"
+    },
+    "toolsets": {
+      "appimage": "1.0.3"
+    },
+    "rpm": {
+      "packageCategory": "Amusements/Games",
+      "depends": [
+        "gtk3",
+        "nss",
+        "(alsa-lib or libasound2)",
+        "(cups-libs or libcups2)",
+        "(mesa-libgbm or libgbm1)",
+        "(libdrm or libdrm2)",
+        "(libxkbcommon or libxkbcommon0)",
+        "at-spi2-core",
+        "(libXtst or libXtst6)",
+        "libXScrnSaver",
+        "xdg-utils",
+        "(libuuid or libuuid1)"
+      ]
+    },
+    "pacman": {
+      "packageCategory": "games",
+      "depends": [
+        "gtk3",
+        "nss",
+        "alsa-lib",
+        "libcups",
+        "mesa",
+        "libdrm",
+        "libxkbcommon",
+        "at-spi2-core",
+        "libxcomposite",
+        "libxdamage",
+        "libxrandr",
+        "libxss",
+        "libxtst",
+        "xdg-utils"
+      ]
     }
   },
   "desktopName": "gambitguessr.desktop"

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=GambitGuessr
+GenericName=Chess Opening Trainer
+Comment=Learn chess openings by naming them, playing their moves and finding the mates
+Exec=gambitguessr %U
+Icon=gambitguessr
+Terminal=false
+Categories=Game;BoardGame;
+Keywords=chess;openings;opening;trainer;puzzle;mate;learn;
+StartupWMClass=gambitguessr

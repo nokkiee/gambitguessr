@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>202015925+nokkiee@users.noreply.github.com</email>
+		<name>nokkiee</name>
+	</maintainer>
+	<use>
+		<flag name="suid">Install the Chromium sandbox helper setuid root (only needed if unprivileged user namespaces are disabled)</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">nokkiee/gambitguessr</remote-id>
+	</upstream>
+</pkgmetadata>

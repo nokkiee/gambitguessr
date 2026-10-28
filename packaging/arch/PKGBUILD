@@ -1,0 +1,28 @@
+# Maintainer: nokkiee <202015925+nokkiee@users.noreply.github.com>
+# AUR package for GambitGuessr, installed from the release tarball.
+pkgname=gambitguessr-bin
+_pkgname=gambitguessr
+pkgver=1.1.2
+pkgrel=1
+pkgdesc='Learn chess openings by guessing them, plus mate-in-one puzzles (5 languages)'
+arch=('x86_64')
+url='https://github.com/nokkiee/gambitguessr'
+license=('GPL-3.0-or-later')
+depends=('gtk3' 'nss' 'alsa-lib' 'libcups' 'mesa' 'libdrm' 'libxkbcommon' 'at-spi2-core'
+         'libxcomposite' 'libxdamage' 'libxrandr' 'libxss' 'libxtst' 'xdg-utils')
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+options=('!strip' '!debug')
+source=("$_pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$_pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  cd "$_pkgname-$pkgver"
+  install -d "$pkgdir/opt/$_pkgname" "$pkgdir/usr/bin"
+  cp -a . "$pkgdir/opt/$_pkgname/"
+  ln -s "/opt/$_pkgname/$_pkgname" "$pkgdir/usr/bin/$_pkgname"
+  install -Dm644 "$_pkgname.desktop" "$pkgdir/usr/share/applications/$_pkgname.desktop"
+  install -Dm644 "$_pkgname.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/$_pkgname.png"
+  install -Dm644 resources/LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 resources/THIRD_PARTY_NOTICES.md "$pkgdir/usr/share/licenses/$pkgname/THIRD_PARTY_NOTICES.md"
+}

@@ -130,9 +130,32 @@ if (!app.requestSingleInstanceLock()) {
     Menu.setApplicationMenu(null);
     protocol.handle('gambit', serve);
     createWindow();
+    if (process.env.GAMBIT_SMOKE) smokeTest();
   });
 
   app.on('window-all-closed', () => app.quit());
+}
+
+// Packaging check (GAMBIT_SMOKE=1, used by the Linux distro tests): once the page has
+// loaded its data and shows the app or the first-start language picker, print one line
+// and quit. Exit code 0 = started fine.
+function smokeTest() {
+  const fail = (why) => { console.log(`GAMBIT_SMOKE_FAIL ${why}`); app.exit(1); };
+  const timer = setTimeout(() => fail('timeout'), 90000);
+  win.webContents.on('render-process-gone', (_e, d) => fail(`renderer ${d.reason}`));
+  const poll = setInterval(async () => {
+    try {
+      const state = await win.webContents.executeJavaScript(
+        "document.getElementById('language')?.open ? 'language-picker' : (document.body.classList.contains('loading') ? '' : 'app')");
+      if (!state) return;
+      clearInterval(poll);
+      clearTimeout(timer);
+      console.log(`GAMBIT_SMOKE_OK ${app.getVersion()} ${state}`);
+      app.exit(0);
+    } catch {
+      // The page is still loading.
+    }
+  }, 500);
 }
 
 module.exports = { getWindow: () => win };

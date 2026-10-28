@@ -1,0 +1,58 @@
+name: Linux distros
+
+# Builds every Linux package and installs and starts each one on the distro it is for,
+# inside the official container images: Linux Mint, Fedora, Arch Linux and Gentoo.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Tools for .rpm and pacman packages
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rpm libarchive-tools
+      - run: npm ci
+      - run: npx electron-builder --linux AppImage deb rpm pacman tar.gz --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+            dist/*.pacman
+            dist/*.tar.gz
+          retention-days: 14
+
+  test:
+    needs: build
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ matrix.timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Linux Mint 22, image: 'linuxmintd/mint22.1-amd64', script: test-mint.sh, timeout: 30 }
+          - { name: Linux Mint 21, image: 'linuxmintd/mint21.3-amd64', script: test-mint.sh, timeout: 30 }
+          - { name: Fedora, image: 'fedora:latest', script: test-fedora.sh, timeout: 30 }
+          - { name: Arch Linux, image: 'archlinux:latest', script: test-arch.sh, timeout: 40 }
+          - { name: Gentoo, image: 'gentoo/stage3:latest', script: test-gentoo.sh, timeout: 180 }
+    container:
+      image: ${{ matrix.image }}
+      # FUSE lets the AppImage mount itself, as it would on a desktop.
+      options: --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-packages
+          path: dist
+      - run: bash packaging/ci/${{ matrix.script }}
