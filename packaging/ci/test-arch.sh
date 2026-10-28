@@ -12,7 +12,7 @@ set -x
 pacman -R --noconfirm gambitguessr
 id builder >/dev/null 2>&1 || useradd -m builder
 install -d -o builder /home/builder/aur
-install -m 644 -o builder packaging/arch/PKGBUILD packaging/arch/.SRCINFO dist/gambitguessr-*.tar.gz /home/builder/aur/
+install -m 644 -o builder packaging/arch/PKGBUILD packaging/arch/.SRCINFO packaging/arch/*.install dist/gambitguessr-*.tar.gz /home/builder/aur/
 su builder -c 'cd ~/aur && makepkg --printsrcinfo | diff - .SRCINFO'
 su builder -c 'cd ~/aur && makepkg --noconfirm --skipchecksums'
 pacman -U --noconfirm /home/builder/aur/gambitguessr-bin-*.pkg.tar.zst
