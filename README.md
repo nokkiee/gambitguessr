@@ -54,7 +54,6 @@ echo local | sudo tee /var/db/repos/local/profiles/repo_name
 printf 'masters = gentoo\nthin-manifests = true\n' | sudo tee /var/db/repos/local/metadata/layout.conf
 printf '[local]\nlocation = /var/db/repos/local\n' | sudo tee /etc/portage/repos.conf/local.conf
 sudo cp -r packaging/gentoo/games-board /var/db/repos/local/
-sudo ebuild /var/db/repos/local/games-board/gambitguessr-bin/gambitguessr-bin-*.ebuild manifest
 echo 'games-board/gambitguessr-bin ~amd64' | sudo tee /etc/portage/package.accept_keywords/gambitguessr
 sudo emerge games-board/gambitguessr-bin
 ```
