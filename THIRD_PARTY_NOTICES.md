@@ -7,6 +7,8 @@ license below allows redistribution, including inside GPL-3.0 software.
 | What | Where in this repo | Author | License |
 |---|---|---|---|
 | Chess opening names and lines | `data/raw/`, `renderer/data/openings.json` | [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings) contributors | CC0 1.0 (public domain) |
+| Mate-in-one puzzles | `renderer/data/puzzles.json` | [Lichess puzzle database](https://database.lichess.org/#puzzles) | CC0 1.0 (public domain) |
+| Opening names in other languages | `renderer/data/opening-names.json` | Titles of the matching Wikipedia articles, plus some added by hand | Names are facts, not copyrighted text |
 | chess.js (move rules) | `renderer/vendor/chess.js` | Jeff Hlywa | BSD-2-Clause, see `licenses/chess.js-BSD-2-Clause.txt` |
 | Inter font | `renderer/fonts/` | The Inter Project Authors | SIL Open Font License 1.1, see `licenses/Inter-OFL-1.1.txt` |
 | "Classic" pieces (cburnett) | `renderer/pieces/cburnett/` | [Colin M.L. Burnett](https://en.wikipedia.org/wiki/User:Cburnett) | GPL-2.0-or-later |

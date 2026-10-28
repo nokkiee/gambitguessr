@@ -1,12 +1,15 @@
 # GambitGuessr
 
 **Learn chess openings by guessing them.** GeoGuessr drops you somewhere in the world and you
-guess where. GambitGuessr plays out the first moves of a game and you guess the opening, or
-it names an opening and you play its moves on the board.
+guess where. GambitGuessr plays out the first moves of a game and you guess the opening.
+It can also name an opening for you to play on the board, or show you a position from a real
+game where there's a checkmate in one to find.
 
-It's a free desktop app for Windows and Linux, styled after chess.com's game screen. It works
-offline and has no account, ads or tracking. It covers all 3,177 named openings from the
-Lichess opening database, from the Italian Game to the Sicilian Najdorf's English Attack.
+It's a free desktop app for Windows and Linux, styled after chess.com's game screen.
+- **Offline:** no account, ads or tracking.
+- **Openings:** all 3,177 named openings from the Lichess opening database, from the Italian Game to the Sicilian Najdorf's English Attack.
+- **Puzzles:** 2,787 mate-in-one puzzles from real games, plus famous opening traps.
+- **Languages:** English, Polish, German, Spanish and French.
 
 ![Name It: guess the opening from the board](docs/screenshots/name-it.png)
 
@@ -48,6 +51,24 @@ them. The app answers with the book moves for the other side.
 - **Hint** shows which piece to move, then the arrow.
 - **You play: Auto** gives you the side that owns the opening: Black for the Sicilian, White for the Ruy Lopez.
 
+### Mate It: find the checkmate
+
+![Mate It: a mate in one from a real Italian Game](docs/screenshots/mate-it.png)
+
+Your opponent's last move is played on the board, and you find the checkmate in one.
+- Every position comes from a real game, and the app shows which opening that game was.
+- Any mating move counts, even if it's not the one played in the game.
+- **Opening traps** starts with famous traps, each shown move by move before you deliver the final blow:
+  Fool's Mate, Scholar's Mate, Légal's Mate, the Blackburne Shilling, Englund, Kieninger and Siberian traps, and more.
+  After those come real games that ended in mate by move 10.
+- The levels follow the puzzles' Lichess ratings:
+  - Beginner: rated under 1000.
+  - Intermediate: 1000–1599.
+  - Expert: 1600 and up.
+- A wrong move gets a red ✕ and is taken back.
+- **Hint** shows which piece mates, then the arrow.
+- After solving, you can open the original game on Lichess.
+
 ### Library: see what's left to learn
 
 ![Library: Beginner, Intermediate and Expert categories with progress](docs/screenshots/library.png)
@@ -60,6 +81,17 @@ Every opening belongs to one of three categories, and each shows how many you've
 An opening counts as **learned** once you've named it on the first try and played it without
 mistakes or hints. The **To learn** filter shows exactly what stands between you and
 completing a category. Openings you get wrong come back more often.
+
+### In your language
+
+![The Library in Polish](docs/screenshots/polish.png)
+
+Pick **English, Polski, Deutsch, Español or Français** in Settings. By default the app follows
+your computer's language.
+- **Opening names:** the common ones show in your language too: *Obrona sycylijska*, *Sizilianische Verteidigung*, *Defensa siciliana*, *Défense sicilienne*.
+- **Name It answers:** these names are accepted in any of the five languages.
+- **Variation names:** these stay in their international English form, as on Lichess.
+- **Moves:** they're written with small piece pictures (♘f3) instead of letters, so they read the same everywhere.
 
 ### Make it yours
 
@@ -75,8 +107,8 @@ completing a category. Openings you get wrong come back more often.
 | `Enter` | submit the answer or go to the next opening |
 | `←` `→` `↑` `↓` | step through the moves |
 | `F` | flip the board |
-| `H` | hint (Play It) |
-| `1` `2` `3` | switch between Name It, Play It and Library |
+| `H` | hint (Play It, Mate It) |
+| `1` `2` `3` `4` | switch between Name It, Play It, Mate It and Library |
 
 ## Run from source
 
@@ -91,25 +123,31 @@ npm start
 
 | Command | Does |
 |---|---|
-| `npm test` | unit tests: answer checking and the whole opening dataset |
+| `npm test` | unit tests: answer checking, translations, the whole opening dataset and every puzzle |
 | `npm run test:e2e` | drives the real app with mouse and keyboard and saves screenshots (Linux) |
 | `npm run dist` | builds the Linux AppImage and .deb into `dist/` |
 | `npm run dist:win` | builds the Windows installer and portable .exe (on Windows, or on Linux with Wine) |
 | `npm run data` | rebuilds `renderer/data/openings.json`; add `-- --fetch` to re-download from Lichess |
+| `npm run puzzles` | rebuilds `renderer/data/puzzles.json` from the Lichess puzzle database; add `-- --fetch` to download it (about 300 MB) |
 | `npm run install-desktop` | adds the source version to your Linux app menu |
 
 Where things are:
 - `data/curated.js`: the hand-picked Beginner and Intermediate openings, with their nicknames and representative lines.
 - `renderer/js/grading.js`: decides whether a typed name is right.
 - `renderer/js/board.js`: the chessboard, covering drawing, animation, drag and drop, and arrows.
-- `renderer/js/modes/`: the three screens.
+- `renderer/js/modes/`: the four screens.
+- `renderer/i18n/`: the translations, one file per language. English is the reference.
+- `renderer/data/opening-names.json`: opening names in other languages.
 
-Contributions are welcome, especially more nicknames, better representative lines,
-and more of the openings people actually play in the Beginner and Intermediate lists.
+Contributions are welcome, especially:
+- more nicknames and better representative lines
+- more of the openings people actually play in the Beginner and Intermediate lists
+- translation fixes, or a new language: copy `renderer/i18n/en.js` and add it to `renderer/js/i18n.js`. The tests check that nothing is missing.
 
 ## License
 
 GambitGuessr is free software under the [GNU GPL v3.0 or later](LICENSE).
 - **Opening data:** from [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings), public domain (CC0).
+- **Puzzles:** from the [Lichess puzzle database](https://database.lichess.org/#puzzles), also CC0.
 - **Bundled pieces, font and libraries:** these keep their own free licenses, listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 - **Not affiliated with chess.com or GeoGuessr:** it uses none of their artwork, sounds or code.
