@@ -127,7 +127,8 @@
         "(libXtst or libXtst6)",
         "libXScrnSaver",
         "xdg-utils",
-        "(libuuid or libuuid1)"
+        "(libuuid or libuuid1)",
+        "util-linux"
       ],
       "afterInstall": "packaging/linux/after-install.tpl"
     },

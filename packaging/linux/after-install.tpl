@@ -12,16 +12,17 @@ fi
 
 # Chromium's sandbox needs user namespaces, or else the SUID chrome-sandbox helper.
 # GambitGuessr change to electron-builder's script: test as an ordinary user, because
-# that's who runs the app. Root can almost always create user namespaces, even where
-# ordinary users can't (linux-hardened, older Debian, hardened Gentoo, containers).
+# that's who runs the app, and test what Chromium actually does (user + PID + network
+# namespaces). Root can almost always do it, even where ordinary users can't
+# (linux-hardened, older Debian, hardened Gentoo, some containers).
 userns_for_users() {
     [[ -L /proc/self/ns/user ]] || return 1
     if command -v runuser >/dev/null 2>&1; then
-        runuser -u nobody -- unshare --user true 2>/dev/null
+        runuser -u nobody -- unshare --user --map-root-user --pid --net --fork true 2>/dev/null
     elif command -v setpriv >/dev/null 2>&1; then
-        setpriv --reuid=65534 --regid=65534 --clear-groups unshare --user true 2>/dev/null
+        setpriv --reuid=65534 --regid=65534 --clear-groups unshare --user --map-root-user --pid --net --fork true 2>/dev/null
     else
-        unshare --user true 2>/dev/null
+        unshare --user --map-root-user --pid --net --fork true 2>/dev/null
     fi
 }
 if ! userns_for_users; then
