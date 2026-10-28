@@ -727,3 +727,37 @@ svg.icon { width: 20px; height: 20px; flex: none; display: block; }
 @container (max-width: 390px) {
   .seg-opt { padding: 7px 5px; font-size: 12px; }
 }
+
+/* ---- language picker -------------------------------------------------------------------------- */
+
+.lang-dialog { width: min(600px, 92vw); padding: 30px 30px 26px; text-align: center; position: relative; }
+.lang-close { position: absolute; top: 12px; right: 14px; }
+.lang-hero { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 18px; }
+.lang-hero .logo-mark { width: 44px; height: 44px; border-radius: 10px; background-size: 37px; flex: none; }
+.lang-hero .logo-text { font-size: 28px; }
+.lang-title { font-size: 22px; font-weight: 800; margin-bottom: 18px; }
+.lang-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.lang-card {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 16px 6px 14px;
+  border: 2px solid transparent; border-radius: 10px;
+  background: var(--raised);
+  color: var(--text-2);
+  cursor: pointer;
+  font-weight: 700;
+}
+.lang-card:hover { background: #383532; color: var(--text); }
+.lang-card.active { border-color: var(--green); color: var(--text); background: color-mix(in srgb, var(--green) 12%, var(--raised)); }
+.lang-card:focus-visible { outline: 2px solid var(--green-hi); outline-offset: 2px; }
+.lang-code {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--btn); color: var(--text);
+  font-size: 15px; font-weight: 800; letter-spacing: 0.04em;
+}
+.lang-card.active .lang-code { background: var(--green); }
+.lang-name { font-size: 14px; }
+.lang-sub { color: var(--text-3); font-size: 13px; margin: 18px 0 20px; }
+.lang-actions { display: flex; justify-content: center; }
+.lang-confirm { min-width: 200px; }
+@media (max-width: 640px) { .lang-grid { grid-template-columns: repeat(3, 1fr); } }

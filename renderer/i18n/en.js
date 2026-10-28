@@ -182,6 +182,11 @@ export default {
   'trap.froms': 'From’s Gambit Trap',
 
   // Settings
+  'welcome.title': 'Choose your language',
+  'welcome.sub': 'You can change it any time with the language button in the sidebar, or in Settings.',
+  'welcome.start': 'Let’s play',
+  'welcome.save': 'Save',
+
   'set.title': 'Settings',
   'set.close': 'Close (Esc)',
   'set.language': 'Language',

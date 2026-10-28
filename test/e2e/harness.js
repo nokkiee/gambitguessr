@@ -107,7 +107,12 @@ function waitFor(fn, ms = 10000, step = 50) {
   const scenario = require(path.resolve(process.argv[process.argv.length - 1]));
   let code = 0;
   try {
-    await waitFor(() => H.js(`!document.body.classList.contains('loading')`));
+    // A fresh start asks for the language; pick English unless the scenario tests that screen.
+    await waitFor(() => H.js(`!document.body.classList.contains('loading') || document.getElementById('language').open`));
+    if (!scenario.keepWelcome && await H.js(`document.getElementById('language').open`)) {
+      await H.js(`document.querySelector('.lang-card[data-lang="en"]').click(); document.querySelector('.lang-confirm').click();`);
+    }
+    if (!scenario.keepWelcome) await waitFor(() => H.js(`!document.body.classList.contains('loading')`));
     await scenario(H);
     if (errors.length) throw new Error(`renderer logged ${errors.length} error(s)`);
     console.log('PASS');

@@ -173,6 +173,11 @@ export default {
   'trap.siberian': 'Pułapka syberyjska',
   'trap.froms': 'Pułapka w gambicie Froma',
 
+  'welcome.title': 'Wybierz język',
+  'welcome.sub': 'Możesz go zmienić w każdej chwili przyciskiem języka na pasku bocznym albo w Ustawieniach.',
+  'welcome.start': 'Zaczynamy',
+  'welcome.save': 'Zapisz',
+
   'set.title': 'Ustawienia',
   'set.close': 'Zamknij (Esc)',
   'set.language': 'Język',

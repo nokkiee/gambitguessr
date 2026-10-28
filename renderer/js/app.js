@@ -3,8 +3,8 @@ import { Board } from './board.js';
 import { loadOpenings, LEVELS } from './openings.js';
 import { loadPuzzles } from './puzzles.js';
 import { settings, setSetting, resetProgress } from './store.js';
-import { LANGUAGES, pickLanguage, setLanguage, t } from './i18n.js';
-import { h, icon, fitButtonRows } from './ui.js';
+import { LANGUAGES, pickLanguage, setLanguage, t, tIn, lang } from './i18n.js';
+import { h, icon, button, fitButtonRows } from './ui.js';
 import { NameView } from './modes/name.js';
 import { PlayView } from './modes/play.js';
 import { MateView } from './modes/mate.js';
@@ -71,6 +71,60 @@ function renderNav() {
   settingsBtn.innerHTML = icon('settings') + `<span>${t('nav.settings')}</span>`;
   settingsBtn.title = t('nav.settings');
   document.querySelector('#settings .dlg-close').title = t('set.close');
+  const langBtn = document.getElementById('btn-lang');
+  langBtn.innerHTML = icon('globe') + `<span>${LANGUAGES.find(([c]) => c === lang)[1]}</span>`;
+  langBtn.title = t('set.language');
+}
+
+// ---- language picker: shown on the very first start, and from the sidebar's language button ----
+
+/**
+ * Lets the player choose the interface language. On the first start it can't be dismissed
+ * without choosing; the choice is saved, so it isn't asked again.
+ * @returns {Promise<void>} resolves once a language is chosen (or the picker is closed)
+ */
+function openLanguagePicker({ firstRun = false } = {}) {
+  const dlg = document.getElementById('language');
+  let chosen = lang;
+  return new Promise((resolve) => {
+    const done = () => {
+      dlg.removeEventListener('cancel', onCancel);
+      if (dlg.open) dlg.close();
+      resolve();
+    };
+    const confirm = () => {
+      changeLanguage(chosen);
+      done();
+    };
+    const onCancel = (e) => {
+      if (firstRun) e.preventDefault(); // a choice is needed on the first start
+      else done();
+    };
+    dlg.addEventListener('cancel', onCancel);
+
+    const render = () => {
+      dlg.lang = chosen;
+      dlg.replaceChildren(...[
+        firstRun ? null : h('button', { type: 'button', class: 'dlg-close lang-close', title: tIn(chosen, 'set.close'), onclick: done }, '✕'),
+        h('div', { class: 'lang-hero' },
+          h('span', { class: 'logo-mark' }),
+          h('span', { class: 'logo-text' }, 'Gambit', h('span', { class: 'logo-accent' }, 'Guessr'))),
+        h('div', { class: 'lang-title' }, tIn(chosen, 'welcome.title')),
+        h('div', { class: 'lang-grid', role: 'radiogroup' }, ...LANGUAGES.map(([code, label]) => h('button', {
+          type: 'button', role: 'radio', 'aria-checked': String(code === chosen), lang: code, 'data-lang': code,
+          class: 'lang-card' + (code === chosen ? ' active' : ''),
+          onclick: () => { chosen = code; render(); },
+          ondblclick: () => { chosen = code; confirm(); },
+        }, h('span', { class: 'lang-code' }, code.toUpperCase()), h('span', { class: 'lang-name' }, label)))),
+        h('div', { class: 'lang-sub' }, tIn(chosen, 'welcome.sub')),
+        h('div', { class: 'lang-actions' },
+          button(tIn(chosen, firstRun ? 'welcome.start' : 'welcome.save'), { kind: 'primary', onclick: confirm, cls: 'lang-confirm' })),
+      ].filter(Boolean));
+      dlg.querySelector('.lang-card.active')?.focus();
+    };
+    render();
+    if (!dlg.open) dlg.showModal();
+  });
 }
 
 function applyAppearance() {
@@ -165,7 +219,7 @@ function openSettings() {
 // ---- keyboard --------------------------------------------------------------------------
 
 function onKey(e) {
-  if (document.getElementById('settings').open) return;
+  if (document.getElementById('settings').open || document.getElementById('language').open) return;
   const typing = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
   if (!typing && (e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey) {
     board.flip();
@@ -185,6 +239,7 @@ async function main() {
   setLanguage(pickLanguage(settings.lang, navigator.language));
   renderNav();
   document.getElementById('btn-settings').onclick = openSettings;
+  document.getElementById('btn-lang').onclick = () => openLanguagePicker();
   document.getElementById('btn-sound').onclick = () => { setSetting('sound', !settings.sound); applyAppearance(); };
   document.getElementById('settings').addEventListener('click', (e) => {
     if (e.target.id === 'settings' || e.target.closest('.dlg-close')) document.getElementById('settings').close();
@@ -197,6 +252,8 @@ async function main() {
   await loadOpenings();
   await loadPuzzles();
   views = { name: new NameView(ctx), play: new PlayView(ctx), mate: new MateView(ctx), library: new LibraryView(ctx) };
+  // First start: ask which language to use (the system language is preselected).
+  if (!settings.lang) await openLanguagePicker({ firstRun: true });
   document.addEventListener('keydown', onKey);
   // Re-fit button rows whenever a screen redraws its panel or the window is resized.
   new MutationObserver(() => fitButtonRows(ctx.panel)).observe(ctx.panel, { childList: true, subtree: true });

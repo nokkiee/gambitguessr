@@ -173,6 +173,11 @@ export default {
   'trap.siberian': 'Trampa siberiana',
   'trap.froms': 'Trampa del gambito From',
 
+  'welcome.title': 'Elige tu idioma',
+  'welcome.sub': 'Puedes cambiarlo cuando quieras con el botón de idioma de la barra lateral o en Ajustes.',
+  'welcome.start': '¡A jugar!',
+  'welcome.save': 'Guardar',
+
   'set.title': 'Ajustes',
   'set.close': 'Cerrar (Esc)',
   'set.language': 'Idioma',

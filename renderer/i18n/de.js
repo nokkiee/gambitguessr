@@ -173,6 +173,11 @@ export default {
   'trap.siberian': 'Sibirische Falle',
   'trap.froms': 'Falle im From-Gambit',
 
+  'welcome.title': 'Wähle deine Sprache',
+  'welcome.sub': 'Du kannst sie jederzeit über die Sprachschaltfläche in der Seitenleiste oder in den Einstellungen ändern.',
+  'welcome.start': 'Los geht’s',
+  'welcome.save': 'Speichern',
+
   'set.title': 'Einstellungen',
   'set.close': 'Schließen (Esc)',
   'set.language': 'Sprache',

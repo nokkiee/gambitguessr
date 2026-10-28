@@ -173,6 +173,11 @@ export default {
   'trap.siberian': 'Piège sibérien',
   'trap.froms': 'Piège du gambit From',
 
+  'welcome.title': 'Choisissez votre langue',
+  'welcome.sub': 'Vous pouvez la changer à tout moment avec le bouton de langue de la barre latérale, ou dans les Paramètres.',
+  'welcome.start': 'C’est parti\u00a0!',
+  'welcome.save': 'Enregistrer',
+
   'set.title': 'Paramètres',
   'set.close': 'Fermer (Échap)',
   'set.language': 'Langue',

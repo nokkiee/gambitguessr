@@ -46,6 +46,7 @@ const ICONS = {
   half: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
   trophy: '<path d="M7 4h10v5a5 5 0 0 1-10 0zM12 14v3.5M8.5 20h7M7 6H4.5c0 2.5 1.2 4 3 4.2M17 6h2.5c0 2.5-1.2 4-3 4.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
   mate: '<path d="M12 2.6v3.6M10.2 4.3h3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6.5 20.5h11l-.9-4.4c2-1.2 3.3-3.2 3.3-5.4 0-2-1.6-3.4-3.5-3.4-1.7 0-3 1-4.4 2.8-1.4-1.8-2.7-2.8-4.4-2.8C5.7 7.3 4.1 8.7 4.1 10.7c0 2.2 1.3 4.2 3.3 5.4z" fill="currentColor"/><path d="M9.4 12.4l5.2 5.2M14.6 12.4l-5.2 5.2" stroke="#262522" stroke-width="1.8" stroke-linecap="round"/>',
+  globe: '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.6 5.2 3.6 8.5s-1.2 6.1-3.6 8.5c-2.4-2.4-3.6-5.2-3.6-8.5s1.2-6.1 3.6-8.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
   book: '<path d="M3.5 6c2.8-1.3 5.6-1.3 8.5.6 2.9-1.9 5.7-1.9 8.5-.6v12.5c-2.8-1.3-5.6-1.3-8.5.6-2.9-1.9-5.7-1.9-8.5-.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 6.6v12.5" stroke="currentColor" stroke-width="2"/>',
 };

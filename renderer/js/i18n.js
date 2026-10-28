@@ -34,13 +34,23 @@ export const num = (n) => numbers.format(n);
  * language, and a plural entry ({one, few, many, other}) is chosen by `vars.n`.
  */
 export function t(key, vars = {}) {
-  let s = DICTS[lang][key] ?? en[key];
+  return translate(lang, key, vars, plural, numbers);
+}
+
+/** Translates into a given language without switching the interface (the language picker previews). */
+export function tIn(code, key, vars = {}) {
+  const c = DICTS[code] ? code : 'en';
+  return translate(c, key, vars, new Intl.PluralRules(c), new Intl.NumberFormat(c));
+}
+
+function translate(code, key, vars, pluralRules, numberFormat) {
+  let s = DICTS[code][key] ?? en[key];
   if (s == null) return key;
-  if (typeof s === 'object') s = s[plural.select(vars.n ?? 0)] ?? s.other;
+  if (typeof s === 'object') s = s[pluralRules.select(vars.n ?? 0)] ?? s.other;
   return s.replace(/\{(\w+)\}/g, (whole, k) => {
     const v = vars[k];
     if (v == null) return whole;
-    return typeof v === 'number' ? num(v) : String(v);
+    return typeof v === 'number' ? numberFormat.format(v) : String(v);
   });
 }
 

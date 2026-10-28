@@ -86,8 +86,10 @@ completing a category. Openings you get wrong come back more often.
 
 ![The Library in Polish](docs/screenshots/polish.png)
 
-Pick **English, Polski, Deutsch, Español or Français** in Settings. By default the app follows
-your computer's language.
+The first time you start GambitGuessr, it asks which language you want: **English, Polski,
+Deutsch, Español or Français**. Your computer's language is preselected, and your choice is
+remembered. You can change it any time with the 🌐 language button at the bottom of the
+sidebar, or in Settings.
 - **Opening names:** the common ones show in your language too: *Obrona sycylijska*, *Sizilianische Verteidigung*, *Defensa siciliana*, *Défense sicilienne*.
 - **Name It answers:** these names are accepted in any of the five languages.
 - **Variation names:** these stay in their international English form, as on Lichess.
