@@ -11,7 +11,9 @@ FEATURES="${FEATURES} getbinpkg binpkg-request-signature"
 EMERGE_DEFAULT_OPTS="--jobs=4 --load-average=4 --quiet-build=y --usepkg --binpkg-respect-use=y"
 ACCEPT_LICENSE="*"
 CONF
-mkdir -p /etc/portage/package.accept_keywords /etc/portage/repos.conf /var/db/repos/local/{metadata,profiles}
+mkdir -p /etc/portage/package.accept_keywords /etc/portage/package.use /etc/portage/repos.conf /var/db/repos/local/{metadata,profiles}
+# xvfb-run needs the virtual X server, which Gentoo's binary X server isn't built with.
+echo 'x11-base/xorg-server xvfb' > /etc/portage/package.use/xvfb
 echo 'games-board/gambitguessr-bin ~amd64' > /etc/portage/package.accept_keywords/gambitguessr
 echo local > /var/db/repos/local/profiles/repo_name
 printf 'masters = gentoo\nthin-manifests = true\n' > /var/db/repos/local/metadata/layout.conf

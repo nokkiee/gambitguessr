@@ -23,6 +23,7 @@ pkgbase = gambitguessr-bin
 	conflicts = gambitguessr
 	options = !strip
 	options = !debug
+	install = gambitguessr-bin.install
 	source = gambitguessr-1.1.2.tar.gz::https://github.com/nokkiee/gambitguessr/releases/download/v1.1.2/gambitguessr-1.1.2.tar.gz
 	sha256sums = SKIP
 

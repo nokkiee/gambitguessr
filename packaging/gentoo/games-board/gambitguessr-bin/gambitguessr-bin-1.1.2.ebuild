@@ -53,3 +53,14 @@ src_install() {
 	domenu gambitguessr.desktop
 	newicon -s 512 gambitguessr.png gambitguessr.png
 }
+
+pkg_postinst() {
+	xdg_pkg_postinst
+	if ! use suid; then
+		local clone=/proc/sys/kernel/unprivileged_userns_clone max=/proc/sys/user/max_user_namespaces
+		if [[ -r ${clone} && $(<"${clone}") == 0 ]] || [[ -r ${max} && $(<"${max}") == 0 ]]; then
+			ewarn "Unprivileged user namespaces are disabled on this system, so GambitGuessr's"
+			ewarn "sandbox can't start. Re-emerge with USE=suid to fix this."
+		fi
+	fi
+}

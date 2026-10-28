@@ -13,6 +13,7 @@ depends=('gtk3' 'nss' 'alsa-lib' 'libcups' 'mesa' 'libdrm' 'libxkbcommon' 'at-sp
 provides=("$_pkgname")
 conflicts=("$_pkgname")
 options=('!strip' '!debug')
+install="$pkgname.install"
 source=("$_pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$_pkgname-$pkgver.tar.gz")
 sha256sums=('SKIP')
 

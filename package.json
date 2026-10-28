@@ -84,7 +84,8 @@
       ]
     },
     "deb": {
-      "packageCategory": "games"
+      "packageCategory": "games",
+      "afterInstall": "packaging/linux/after-install.tpl"
     },
     "extraResources": [
       "LICENSE",
@@ -127,7 +128,8 @@
         "libXScrnSaver",
         "xdg-utils",
         "(libuuid or libuuid1)"
-      ]
+      ],
+      "afterInstall": "packaging/linux/after-install.tpl"
     },
     "pacman": {
       "packageCategory": "games",
@@ -146,7 +148,8 @@
         "libxss",
         "libxtst",
         "xdg-utils"
-      ]
+      ],
+      "afterInstall": "packaging/linux/after-install.tpl"
     }
   },
   "desktopName": "gambitguessr.desktop"

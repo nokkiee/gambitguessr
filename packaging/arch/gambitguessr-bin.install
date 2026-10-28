@@ -1,0 +1,17 @@
+# Chromium's sandbox needs user namespaces for ordinary users, or else the setuid
+# chrome-sandbox helper (for example on the linux-hardened kernel).
+_sandbox() {
+  if runuser -u nobody -- unshare --user true 2>/dev/null; then
+    chmod 0755 /opt/gambitguessr/chrome-sandbox
+  else
+    chmod 4755 /opt/gambitguessr/chrome-sandbox
+  fi
+}
+
+post_install() {
+  _sandbox
+}
+
+post_upgrade() {
+  _sandbox
+}

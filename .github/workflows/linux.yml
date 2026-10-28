@@ -56,3 +56,24 @@ jobs:
           name: linux-packages
           path: dist
       - run: bash packaging/ci/${{ matrix.script }}
+
+  # The jobs above run in Docker's default setup, where ordinary users can't create user
+  # namespaces, so they test the setuid sandbox fallback. A normal desktop allows them:
+  desktop-like:
+    needs: build
+    name: Fedora (desktop-like, user namespaces allowed)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-packages
+          path: dist
+      - name: Allow unprivileged user namespaces, as desktop distros do
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - run: >
+          docker run --rm -v "$PWD:/work" -w /work
+          --device /dev/fuse --cap-add SYS_ADMIN
+          --security-opt apparmor=unconfined --security-opt seccomp=unconfined
+          fedora:latest bash packaging/ci/test-fedora.sh
