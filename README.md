@@ -11,21 +11,67 @@ It's a free desktop app for Windows and Linux, styled after chess.com's game scr
 - **Puzzles:** 2,787 mate-in-one puzzles from real games, plus famous opening traps.
 - **Languages:** English, Polish, German, Spanish and French.
 
-![Name It: guess the opening from the board](docs/screenshots/name-it.png)
+![Name It: the Sicilian Najdorf, named correctly](docs/screenshots/name-it.png)
 
 ## Download
 
 Get the latest version from the [**Releases page**](../../releases/latest).
 
-| System | File | How |
+### Windows
+
+| | File | How |
 |---|---|---|
-| Windows 10 / 11 | `GambitGuessr-Setup-<version>.exe` | Run it. It installs in a few seconds and adds a Start-menu and desktop shortcut. |
-| Windows, no install | `GambitGuessr-<version>-Portable.exe` | Just run it. |
-| Linux (any distro) | `GambitGuessr-<version>.AppImage` | Make it executable (`chmod +x`), then run it. |
-| Debian / Ubuntu | `gambitguessr_<version>_amd64.deb` | `sudo apt install ./gambitguessr_<version>_amd64.deb` |
+| Windows 10 / 11 | `GambitGuessr-Setup-<version>.exe` | Run it. It installs in a few seconds and adds Start-menu and desktop shortcuts. |
+| No install | `GambitGuessr-<version>-Portable.exe` | Just run it. |
 
 The Windows files aren't code-signed, so Windows may show *"Windows protected your PC"*.
 Click **More info → Run anyway**.
+
+### Linux
+
+Every package below is tested by installing it and starting the app in the official
+Linux Mint, Fedora, Arch Linux and Gentoo containers, on every change
+([Linux distros workflow](../../actions/workflows/linux.yml)).
+
+| Distro | File | Install |
+|---|---|---|
+| **Linux Mint**, Ubuntu, Debian, Pop!_OS, Zorin, elementary | `gambitguessr_<version>_amd64.deb` | Double-click it, or `sudo apt install ./gambitguessr_<version>_amd64.deb` |
+| **Fedora**, openSUSE, RHEL, Nobara | `gambitguessr-<version>.x86_64.rpm` | `sudo dnf install ./gambitguessr-<version>.x86_64.rpm` (openSUSE: `sudo zypper install …`) |
+| **Arch Linux**, Manjaro, EndeavourOS, CachyOS | `gambitguessr-<version>.pacman` | `sudo pacman -U gambitguessr-<version>.pacman`, or build the AUR recipe in [`packaging/arch`](packaging/arch) |
+| **Gentoo** | ebuild in [`packaging/gentoo`](packaging/gentoo) | Copy `games-board/gambitguessr-bin` into a local overlay, then `emerge games-board/gambitguessr-bin` |
+| Any distro, no install | `GambitGuessr-<version>.AppImage` | `chmod +x GambitGuessr-*.AppImage`, then run it. It doesn't need the old `libfuse2`. |
+| Any distro, manual | `gambitguessr-<version>.tar.gz` | Unpack it anywhere and run `./gambitguessr` |
+
+After installing a package, GambitGuessr appears in your app menu under Games, and
+`gambitguessr` starts it from a terminal.
+
+<details>
+<summary>Gentoo: setting up a local overlay</summary>
+
+```
+sudo mkdir -p /var/db/repos/local/{metadata,profiles}
+echo local | sudo tee /var/db/repos/local/profiles/repo_name
+printf 'masters = gentoo\nthin-manifests = true\n' | sudo tee /var/db/repos/local/metadata/layout.conf
+printf '[local]\nlocation = /var/db/repos/local\n' | sudo tee /etc/portage/repos.conf/local.conf
+sudo cp -r packaging/gentoo/games-board /var/db/repos/local/
+sudo ebuild /var/db/repos/local/games-board/gambitguessr-bin/gambitguessr-bin-*.ebuild manifest
+echo 'games-board/gambitguessr-bin ~amd64' | sudo tee /etc/portage/package.accept_keywords/gambitguessr
+sudo emerge games-board/gambitguessr-bin
+```
+
+Turn on the `suid` USE flag only if your kernel has unprivileged user namespaces
+disabled.
+</details>
+
+<details>
+<summary>If the app doesn't start on Linux</summary>
+
+- **AppImage won't open:** it needs FUSE, which every desktop distro has. On a very minimal
+  system, install `fuse3`, or run it with `--appimage-extract-and-run`.
+- **Sandbox error with the `.tar.gz`:** some distros disable unprivileged user namespaces,
+  which the sandbox needs. Use the `.deb`, `.rpm`, pacman package or AppImage, which handle
+  this, or start it with `./gambitguessr --no-sandbox`.
+</details>
 
 ## How it works
 
@@ -43,7 +89,7 @@ The moves play out on the board and you type the opening's name.
 You're given the name of an opening and play its moves by dragging pieces or clicking
 them. The app answers with the book moves for the other side.
 
-![Play It: a book move that leads to a different opening](docs/screenshots/play-it.png)
+![Play It: 3.Bc4 in the Ruy Lopez is a book move, but it leads to the Italian Game](docs/screenshots/play-it.png)
 
 - A correct move gets a green ✓, and a wrong one gets a red ✕ and is taken back.
 - A real opening move that belongs to another line gets a book icon, with the name of the opening it leads to.
@@ -53,7 +99,7 @@ them. The app answers with the book moves for the other side.
 
 ### Mate It: find the checkmate
 
-![Mate It: a mate in one from a real Italian Game](docs/screenshots/mate-it.png)
+![Mate It: a mate in one from a real Sicilian game](docs/screenshots/mate-it.png)
 
 Your opponent's last move is played on the board, and you find the checkmate in one.
 - Every position comes from a real game, and the app shows which opening that game was.
@@ -84,7 +130,7 @@ completing a category. Openings you get wrong come back more often.
 
 ### In your language
 
-![The Library in Polish](docs/screenshots/polish.png)
+![Choosing the language](docs/screenshots/languages.png)
 
 The first time you start GambitGuessr, it asks which language you want: **English, Polski,
 Deutsch, Español or Français**. Your computer's language is preselected, and your choice is
@@ -95,9 +141,11 @@ sidebar, or in Settings.
 - **Variation names:** these stay in their international English form, as on Lichess.
 - **Moves:** they're written with small piece pictures (♘f3) instead of letters, so they read the same everywhere.
 
+![The Library in Polish](docs/screenshots/polish.png)
+
 ### Make it yours
 
-![Brown board with the Celtic pieces](docs/screenshots/themes.png)
+![Brown board with the Celtic pieces, showing the Marshall Attack](docs/screenshots/themes.png)
 
 - **Settings:** 7 piece sets, 5 board colours, animation speed, sound, legal-move dots and coordinates.
 - **Board marks:** right-click a square to mark it, or right-drag to draw an arrow, just like on chess.com.
@@ -127,7 +175,7 @@ npm start
 |---|---|
 | `npm test` | unit tests: answer checking, translations, the whole opening dataset and every puzzle |
 | `npm run test:e2e` | drives the real app with mouse and keyboard and saves screenshots (Linux) |
-| `npm run dist` | builds the Linux AppImage and .deb into `dist/` |
+| `npm run dist` | builds the Linux AppImage, .deb, .rpm, pacman package and .tar.gz into `dist/` (`.rpm` needs `rpm`, pacman needs `bsdtar`) |
 | `npm run dist:win` | builds the Windows installer and portable .exe (on Windows, or on Linux with Wine) |
 | `npm run data` | rebuilds `renderer/data/openings.json`; add `-- --fetch` to re-download from Lichess |
 | `npm run puzzles` | rebuilds `renderer/data/puzzles.json` from the Lichess puzzle database; add `-- --fetch` to download it (about 300 MB) |
