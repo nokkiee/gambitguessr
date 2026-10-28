@@ -25,6 +25,6 @@ pkgbase = gambitguessr-bin
 	options = !strip
 	options = !debug
 	source = gambitguessr-1.2.0.tar.gz::https://github.com/nokkiee/gambitguessr/releases/download/v1.2.0/gambitguessr-1.2.0.tar.gz
-	sha256sums = SKIP
+	sha256sums = 1f53e0aa4e01f051fdfe480bbda7442f1e07e9b35d8fb976472e40c6979052d8
 
 pkgname = gambitguessr-bin

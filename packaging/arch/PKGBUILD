@@ -15,7 +15,7 @@ conflicts=("$_pkgname")
 options=('!strip' '!debug')
 install="$pkgname.install"
 source=("$_pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$_pkgname-$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('1f53e0aa4e01f051fdfe480bbda7442f1e07e9b35d8fb976472e40c6979052d8')
 
 package() {
   cd "$_pkgname-$pkgver"
