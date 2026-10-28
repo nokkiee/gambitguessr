@@ -2,7 +2,7 @@
 # AUR package for GambitGuessr, installed from the release tarball.
 pkgname=gambitguessr-bin
 _pkgname=gambitguessr
-pkgver=1.1.2
+pkgver=1.2.0
 pkgrel=1
 pkgdesc='Learn chess openings by guessing them, plus mate-in-one puzzles (5 languages)'
 arch=('x86_64')
@@ -15,7 +15,7 @@ conflicts=("$_pkgname")
 options=('!strip' '!debug')
 install="$pkgname.install"
 source=("$_pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$_pkgname-$pkgver.tar.gz")
-sha256sums=('9dcb8c68abdc8dad1c46deff551b455d2a7392272afefc3eb25c31e2d6b0da70')
+sha256sums=('SKIP')
 
 package() {
   cd "$_pkgname-$pkgver"

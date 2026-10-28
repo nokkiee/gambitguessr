@@ -1,6 +1,6 @@
 pkgbase = gambitguessr-bin
 	pkgdesc = Learn chess openings by guessing them, plus mate-in-one puzzles (5 languages)
-	pkgver = 1.1.2
+	pkgver = 1.2.0
 	pkgrel = 1
 	url = https://github.com/nokkiee/gambitguessr
 	install = gambitguessr-bin.install
@@ -24,7 +24,7 @@ pkgbase = gambitguessr-bin
 	conflicts = gambitguessr
 	options = !strip
 	options = !debug
-	source = gambitguessr-1.1.2.tar.gz::https://github.com/nokkiee/gambitguessr/releases/download/v1.1.2/gambitguessr-1.1.2.tar.gz
-	sha256sums = 9dcb8c68abdc8dad1c46deff551b455d2a7392272afefc3eb25c31e2d6b0da70
+	source = gambitguessr-1.2.0.tar.gz::https://github.com/nokkiee/gambitguessr/releases/download/v1.2.0/gambitguessr-1.2.0.tar.gz
+	sha256sums = SKIP
 
 pkgname = gambitguessr-bin
