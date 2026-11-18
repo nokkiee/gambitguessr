@@ -6,3 +6,6 @@ build/wine/
 
 # Lichess puzzle dump extract (large; rebuilt by scripts/build-puzzles.js)
 data/raw/lichess_mate1.csv
+
+# graphify knowledge graph (local, rebuilt with /graphify)
+graphify-out/
