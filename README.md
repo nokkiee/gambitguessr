@@ -98,7 +98,7 @@ them. The app answers with the book moves for the other side.
 
 ### Mate It: find the checkmate
 
-![Mate It: a mate in one from a real Sicilian game](docs/screenshots/mate-it.png)
+![Mate It: a mate in one from a real Ruy Lopez game](docs/screenshots/mate-it.png)
 
 Your opponent's last move is played on the board, and you find the checkmate in one.
 - Every position comes from a real game, and the app shows which opening that game was.
