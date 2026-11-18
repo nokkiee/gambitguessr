@@ -2,7 +2,7 @@
 // Puzzles come from the Lichess puzzle database (see scripts/build-puzzles.js): the
 // opponent's move is played first, then the player has to find a checkmate.
 import { Chess } from '../vendor/chess.js';
-import { namedAt, epdOf, checkedKing } from './openings.js';
+import { namedAt, epdOf, playLine } from './openings.js';
 
 let data = { openings: [], puzzles: [], traps: [] };
 let named = [];
@@ -91,22 +91,17 @@ export function pickPuzzle(level, source, recent, status) {
  * player moves (`positions[live]` is the one to solve), and the game's mating move.
  */
 export function preparePuzzle(p) {
-  const positions = [];
-  const push = (chess, move) => positions.push({
-    fen: chess.fen(), move, lastMove: move ? { from: move.from, to: move.to } : null, check: checkedKing(chess),
-  });
   let chess;
+  let positions;
   let solution;
   if (p.trap) {
     chess = new Chess();
-    push(chess, null);
-    for (const san of p.line.slice(0, -1)) push(chess, chess.move(san));
+    positions = playLine(chess, p.line.slice(0, -1));
     solution = new Chess(chess.fen()).move(p.line[p.line.length - 1]);
   } else {
     chess = new Chess(p.fen);
-    push(chess, null);
     const [setup, mate] = p.m.split(' ');
-    push(chess, chess.move({ from: setup.slice(0, 2), to: setup.slice(2, 4), promotion: setup[4] }));
+    positions = playLine(chess, [{ from: setup.slice(0, 2), to: setup.slice(2, 4), promotion: setup[4] }]);
     solution = new Chess(chess.fen()).move({ from: mate.slice(0, 2), to: mate.slice(2, 4), promotion: mate[4] });
   }
   return {

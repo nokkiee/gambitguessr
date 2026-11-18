@@ -149,18 +149,20 @@ export function checkedKing(chess) {
   return null;
 }
 
-/** Replays an opening's moves: verbose moves, plus the FEN and checked king after each ply. */
+/** One step of a line as the board shows it: the position after `move` (null for the start). */
+export function positionOf(chess, move = null) {
+  return { fen: chess.fen(), move, lastMove: move && { from: move.from, to: move.to }, check: checkedKing(chess) };
+}
+
+/** Plays `moves` (SAN or {from, to}) on `chess`: its current position, then one per move. */
+export function playLine(chess, moves) {
+  return [positionOf(chess), ...moves.map((m) => positionOf(chess, chess.move(m)))];
+}
+
+/** Replays an opening's moves: verbose moves, plus the position after each ply. */
 export function replay(o) {
-  const chess = new Chess();
-  const fens = [chess.fen()];
-  const checks = [null];
-  const moves = o.plies.map((san) => {
-    const m = chess.move(san);
-    fens.push(chess.fen());
-    checks.push(checkedKing(chess));
-    return m;
-  });
-  return { moves, fens, checks };
+  const positions = playLine(new Chess(), o.plies);
+  return { moves: positions.slice(1).map((p) => p.move), positions };
 }
 
 /**

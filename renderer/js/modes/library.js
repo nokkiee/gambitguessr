@@ -4,12 +4,11 @@
 import { Chess } from '../../vendor/chess.js';
 import {
   replay, displayAliases, searchText, acceptedNames, openingByName, localFamily, localFamilyOf,
-  checkedKing, LEVELS, categoryOf, inCategory,
+  positionOf, LEVELS, categoryOf, inCategory,
 } from '../openings.js';
 import { puzzlesInCategory, puzzleLevel, puzzleOpening, puzzleSolver, puzzleMoveNumber, preparePuzzle } from '../puzzles.js';
 import { normalize, splitName } from '../grading.js';
 import { settings, setSetting, stats, mastery, mateStatus, recordMate } from '../store.js';
-import { playMove } from '../sound.js';
 import { LANGUAGES, t, tIn, num } from '../i18n.js';
 import { h, icon, button, nameEl, localNameEl, lineEl, renderMoves, navBar, showPly, setPlayers } from '../ui.js';
 
@@ -424,11 +423,9 @@ export class LibraryView {
   showPosition(i, { animate = true, sound = false } = {}) {
     const q = this.prepared;
     this.ply = Math.max(0, Math.min(q.positions.length - 1, i));
-    const pos = q.positions[this.ply];
-    this.ctx.board.setPosition(pos.fen, { lastMove: pos.lastMove, check: pos.check, animate });
-    if (sound && pos.move) playMove(pos.move, !!pos.check);
+    showPly(this.ctx.board, q, this.ply, { animate, sound });
     this.renderPuzzleMoves();
-    this.updatePlayers(pos.fen);
+    this.updatePlayers(q.positions[this.ply].fen);
   }
 
   stepPuzzle(i) {
@@ -454,8 +451,7 @@ export class LibraryView {
     const q = this.prepared;
     if (!this.revealed) {
       const chess = new Chess(q.positions[q.live].fen);
-      const m = chess.move(q.solution.san);
-      q.positions.push({ fen: chess.fen(), move: m, lastMove: { from: m.from, to: m.to }, check: checkedKing(chess) });
+      q.positions.push(positionOf(chess, chess.move(q.solution.san)));
       this.revealed = true;
       recordMate(this.puzzle.id, false);
       this.renderPuzzleDetail();

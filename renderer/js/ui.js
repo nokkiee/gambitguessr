@@ -178,11 +178,11 @@ export function navBar(handlers) {
 
 // ---- stepping through a fixed line ---------------------------------------------
 
-/** Shows ply `n` of a replayed line on the board. */
+/** Shows position `n` of a line (a replayed opening or a prepared puzzle) on the board. */
 export function showPly(board, line, n, { sound = false, animate = true } = {}) {
-  const m = line.moves[n - 1];
-  board.setPosition(line.fens[n], { lastMove: m ? { from: m.from, to: m.to } : null, check: line.checks[n], animate });
-  if (sound && m) playMove(m, !!line.checks[n]);
+  const pos = line.positions[n];
+  board.setPosition(pos.fen, { lastMove: pos.lastMove, check: pos.check, animate });
+  if (sound && pos.move) playMove(pos.move, !!pos.check);
 }
 
 // ---- player bars -----------------------------------------------------------------

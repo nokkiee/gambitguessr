@@ -22,7 +22,9 @@ test('every line is legal and ends in its stored position', () => {
     const c = new Chess();
     for (const san of o.plies) c.move(san);
     assert.equal(epdOf(c), o.epd, o.name);
-    assert.equal(replay(o).fens.length, o.plies.length + 1);
+    const { positions } = replay(o);
+    assert.equal(positions.length, o.plies.length + 1);
+    assert.equal(positions.at(-1).fen, c.fen(), o.name);
   }
 });
 

@@ -1,12 +1,12 @@
 // "Mate It": the opponent's last move is played (or a famous trap is shown move by
 // move), then the player finds the checkmate in one. Any mating move counts.
 import { Chess } from '../../vendor/chess.js';
-import { checkedKing, localFamilyOf } from '../openings.js';
+import { checkedKing, positionOf, localFamilyOf } from '../openings.js';
 import { pickPuzzle, preparePuzzle, puzzlePool } from '../puzzles.js';
 import { settings, setSetting, mateStatus, recordMate, getRecord, setRecord } from '../store.js';
 import { play, playMove } from '../sound.js';
 import { t, num } from '../i18n.js';
-import { h, icon, button, navBar, setPlayers, statEl } from '../ui.js';
+import { h, icon, button, navBar, showPly, setPlayers, statEl } from '../ui.js';
 import { coachEls } from './play.js';
 
 const SOURCES = [['games', 'mate.games', 'mate.gamesTitle'], ['traps', 'mate.traps', 'mate.trapsTitle']];
@@ -161,7 +161,7 @@ export class MateView {
       this.session.streak = 0;
     }
     p.positions.length = p.live + 1;
-    p.positions.push({ fen: chess.fen(), move: m, lastMove: { from: m.from, to: m.to }, check: checkedKing(chess) });
+    p.positions.push(positionOf(chess, m));
     this.view(p.positions.length - 1, { sound: false });
     this.ctx.board.showBadge(m.to, shown ? 'book' : 'correct');
     playMove(m, true);
@@ -208,9 +208,7 @@ export class MateView {
     if (this.locked) return;
     i = Math.max(0, Math.min(p.positions.length - 1, i));
     this.viewIndex = i;
-    const pos = p.positions[i];
-    this.ctx.board.setPosition(pos.fen, { lastMove: pos.lastMove, check: pos.check, animate });
-    if (sound && pos.move) playMove(pos.move, !!pos.check);
+    showPly(this.ctx.board, p, i, { animate, sound });
     if (this.phase !== 'done') this.ctx.board.clearBadges();
     this.enableInput();
     this.updatePlayers();

@@ -180,7 +180,7 @@ export class NameView {
     const white = { name: t('color.white'), avatar: 'av-white', color: 'w' };
     const black = { name: t('color.black'), avatar: 'av-black', color: 'b' };
     const flipped = this.ctx.board.orientation === 'black';
-    setPlayers(this.ctx.bars, { fen: this.line.fens[this.ply], top: flipped ? white : black, bottom: flipped ? black : white });
+    setPlayers(this.ctx.bars, { fen: this.line.positions[this.ply].fen, top: flipped ? white : black, bottom: flipped ? black : white });
   }
 
   render() {
